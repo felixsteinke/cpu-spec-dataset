@@ -1,0 +1,9 @@
+# Test your FastAPI endpoints
+
+POST http://localhost:8080/api/test
+Content-Type: application/json
+Accept: application/json
+
+{
+  "test": "test"
+}
