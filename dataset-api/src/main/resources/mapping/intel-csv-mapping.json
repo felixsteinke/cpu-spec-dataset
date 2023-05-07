@@ -1,46 +1,32 @@
-[
-  {
-    "csv": "cpuName",
-    "db": "name"
-  },
-  {
-    "csv": "manufacturerName",
-    "db": "manufacturer"
-  },
-  {
-    "csv": "productCollection",
-    "db": "product_collection"
-  },
-  {
-    "csv": "totalCores",
-    "db": "cores"
-  },
-  {
-    "csv": "totalThreads",
-    "db": "threads"
-  },
-  {
-    "csv": "baseFrequency",
-    "db": "base_frequency"
-  },
-  {
-    "csv": "turboFrequency",
-    "db": "max_frequency"
-  },
-  {
-    "csv": "defaultTdp",
-    "db": "tdp"
-  },
-  {
-    "csv": "launchDate",
-    "db": "launch_date"
-  },
-  {
-    "csv": "maxRam",
-    "db": "max_ram"
-  },
-  {
-    "csv": "usageType",
-    "db": null
-  }
-]
+{
+  "name": [
+    0
+  ],
+  "manufacturer": [
+    1
+  ],
+  "productCollection": [
+    2
+  ],
+  "cores": [
+    3
+  ],
+  "threads": [
+    4
+  ],
+  "baseFrequency": [
+    5
+  ],
+  "maxFrequency": [
+    6
+  ],
+  "tdp": [
+    7
+  ],
+  "launchDate": [
+    8
+  ],
+  "maxRam": [
+    9
+  ]
+}

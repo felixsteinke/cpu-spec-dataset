@@ -5,15 +5,15 @@ Dataset for CPU specifications from Intel and AMD.
 ## Table of Content
 
 * [Raw Dataset](dataset)
-* [Dataset API Code](dataset-api/src/main/java/cpu/spec/dataset/api)
-* [Dataset API Configs](dataset-api/src/main/resources)
-* [Intel Web Scraper Code](intel-web-scraper/src/main/java/cpu/spec/scraper)
+* [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
+* [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper)
 
 ## Installation
 
 Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
 
 ```shell
+copy ./dataset/* ./dataset-api/src/main/resources/dataset
 mvn clean install
 ```
 
@@ -24,18 +24,57 @@ cd dataset-api
 mvn spring-boot:run
 ```
 
+<details>
+  <summary>Configurations</summary>
+
+[dataset-api/application.properties](dataset-api/src/main/resources)
+
+| Property                                     | Example Value                         | Description                        |
+|----------------------------------------------|---------------------------------------|------------------------------------|
+| `spring.datasource.url`                      | `jdbc:mysql://localhost:3306/cpu_db`  | Full url to a MySQL database       |
+| `spring.datasource.username`                 | `root`                                | Username and usually root          |
+| `spring.datasource.password`                 | `password`                            | Custom password                    |
+| `spring.jpa.properties.hibernate.dialect`    | `org.hibernate.dialect.MySQL8Dialect` |                                    |
+| `spring.jpa.hibernate.ddl-auto`              | `update` or `validate`                | Table schema update mode           |
+| `spring.jpa.defer-datasource-initialization` | `false` or `true`                     | Defer database update with dataset |
+| `logging.level.root`                         | `INFO` or `DEBUG`                     |                                    |
+| `spring.jpa.show-sql`                        | `false` or `true`                     |                                    |
+
+</details>
+
 ## Container Image
+
+```shell
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=cpu_db -p 3306:3306 -d mysql:8
+```
 
 ```shell
 docker build -t cpu-spec-dataset-api .
 docker run -p 8080:80 --name dataset-api cpu-spec-dataset-api
 ```
 
-```shell
-docker push ghcr.io/felixsteinke/cpu-power-calculator:latest
-```
+### Container Configuration
+
+| Environment Key              | Example Value                                   | Description                  |
+|------------------------------|-------------------------------------------------|------------------------------|
+| `SPRING_DATASOURCE_URL`      | `jdbc:mysql://host.docker.internal:3306/cpu_db` | Full url to a MySQL database |
+| `SPRING_DATASOURCE_USERNAME` | `root`                                          | Username and usually root    |
+| `SPRING_DATASOURCE_PASSWORD` | `password`                                      | Custom password              |
 
 ## Dataset Update
+
+<details>
+  <summary>Mapping Configuration</summary>
+
+[dataset-api/mapping](dataset-api/src/main/resources/mapping)
+
+```
+{
+  "entityField": [csvIndex, csvFallbackIndex]
+}
+```
+
+</details>
 
 ### Intel Dataset
 
@@ -55,4 +94,3 @@ from [https://www.amd.com/en/products/specifications/processors](https://www.amd
 ![amd-csv-export](.docs/amd-csv-export.png)
 
 </details>
-

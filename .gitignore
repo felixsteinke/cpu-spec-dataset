@@ -1,4 +1,5 @@
 dataset/test.csv
+dataset-api/src/main/resources/dataset
 
 **/HELP.md
 **/target/
