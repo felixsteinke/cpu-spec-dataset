@@ -49,8 +49,12 @@ docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=cpu_db
 ```
 
 ```shell
-docker build -t cpu-spec-dataset-api .
-docker run -p 8080:80 --name dataset-api cpu-spec-dataset-api
+docker build -t ghcr.io/felixsteinke/cpu-spec-dataset-api:latest .
+docker run -p 8080:80 --name dataset-api ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
+```
+
+```shell
+docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 ```
 
 ### Container Configuration

@@ -1,0 +1,26 @@
+name: Docker-Image
+
+on:
+  workflow_dispatch:
+  # enables manual trigger
+
+jobs:
+  build-and-push:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Build the Docker image
+        run: docker build --tag ghcr.io/${{ github.repository }}-api:latest .
+
+      - name: Log in to Package Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push the Docker Image
+        run: docker push ghcr.io/${{ github.repository }}-api:latest
