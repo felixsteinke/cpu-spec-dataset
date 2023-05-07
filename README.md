@@ -24,6 +24,8 @@ cd dataset-api
 mvn spring-boot:run
 ```
 
+Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset` (e.g. [test_api.http](test_api.http))
+
 <details>
   <summary>Configurations</summary>
 
@@ -80,7 +82,11 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 
 </details>
 
-### Intel Dataset
+### [Intel Dataset](dataset/intel-cpus.csv)
+
+Extracted from
+[https://ark.intel.com/content/www/us/en/ark.html](https://ark.intel.com/content/www/us/en/ark.html#@Processors)
+with the __Intel Web Scraper__.
 
 ```shell
 cd intel-web-scraper
