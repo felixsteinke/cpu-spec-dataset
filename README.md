@@ -13,7 +13,7 @@ Dataset for CPU specifications from Intel and AMD.
 Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
 
 ```shell
-copy ./dataset/* ./dataset-api/src/main/resources/dataset
+copy ./dataset/* ./dataset-api/src/main/resources/dataset/
 mvn clean install
 ```
 
