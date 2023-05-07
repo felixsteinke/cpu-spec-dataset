@@ -1,0 +1,162 @@
+[
+  {
+    "csv": "",
+    "db": null
+  },
+  {
+    "csv": "",
+    "db": null
+  },
+  {
+    "csv": "Model",
+    "db": "name"
+  },
+  {
+    "csv": "Family",
+    "db": "manufacturer"
+  },
+  {
+    "csv": "Line",
+    "db": "product_collection"
+  },
+  {
+    "csv": "Platform",
+    "db": null
+  },
+  {
+    "csv": "Product ID Tray",
+    "db": null
+  },
+  {
+    "csv": "Product ID Boxed",
+    "db": null
+  },
+  {
+    "csv": "Product ID MPB",
+    "db": null
+  },
+  {
+    "csv": "Launch Date",
+    "db": "launch_date"
+  },
+  {
+    "csv": "# of CPU Cores",
+    "db": "cores"
+  },
+  {
+    "csv": "# of CPU Threads",
+    "db": "threads"
+  },
+  {
+    "csv": "Graphics Core Count",
+    "db": null
+  },
+  {
+    "csv": "Base Clock",
+    "db": "base_frequency"
+  },
+  {
+    "csv": "Max. Boost Clock",
+    "db": "max_frequency"
+  },
+  {
+    "csv": "All Core Boost Speed",
+    "db": null
+  },
+  {
+    "csv": "L1 Cache",
+    "db": null
+  },
+  {
+    "csv": "L2 Cache",
+    "db": null
+  },
+  {
+    "csv": "L3 Cache",
+    "db": null
+  },
+  {
+    "csv": "1kU Pricing",
+    "db": null
+  },
+  {
+    "csv": "Unlocked for Overclocking",
+    "db": null
+  },
+  {
+    "csv": "Processor Technology for CPU Cores",
+    "db": null
+  },
+  {
+    "csv": "CPU Socket",
+    "db": null
+  },
+  {
+    "csv": "Socket Count",
+    "db": null
+  },
+  {
+    "csv": "PCI Express Version",
+    "db": null
+  },
+  {
+    "csv": "Thermal Solution PIB",
+    "db": null
+  },
+  {
+    "csv": "Recommended Cooler",
+    "db": null
+  },
+  {
+    "csv": "Thermal Solution MPK",
+    "db": null
+  },
+  {
+    "csv": "Default TDP",
+    "db": "tdp"
+  },
+  {
+    "csv": "AMD Configurable TDP",
+    "db": null
+  },
+  {
+    "csv": "Max. Operating Temperature",
+    "db": null
+  },
+  {
+    "csv": "OS Support",
+    "db": null
+  },
+  {
+    "csv": "System Memory Specification",
+    "db": null
+  },
+  {
+    "csv": "System Memory Type",
+    "db": null
+  },
+  {
+    "csv": "Memory Channels",
+    "db": null
+  },
+  {
+    "csv": "Per Socket Mem BW",
+    "db": null
+  },
+  {
+    "csv": "Graphics Frequency",
+    "db": null
+  },
+  {
+    "csv": "Graphics Model",
+    "db": null
+  },
+  {
+    "csv": "Supported Technologies",
+    "db": null
+  },
+  {
+    "csv": "Workload Affinity",
+    "db": null
+  }
+]

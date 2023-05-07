@@ -1,0 +1,46 @@
+[
+  {
+    "csv": "cpuName",
+    "db": "name"
+  },
+  {
+    "csv": "manufacturerName",
+    "db": "manufacturer"
+  },
+  {
+    "csv": "productCollection",
+    "db": "product_collection"
+  },
+  {
+    "csv": "totalCores",
+    "db": "cores"
+  },
+  {
+    "csv": "totalThreads",
+    "db": "threads"
+  },
+  {
+    "csv": "baseFrequency",
+    "db": "base_frequency"
+  },
+  {
+    "csv": "turboFrequency",
+    "db": "max_frequency"
+  },
+  {
+    "csv": "defaultTdp",
+    "db": "tdp"
+  },
+  {
+    "csv": "launchDate",
+    "db": "launch_date"
+  },
+  {
+    "csv": "maxRam",
+    "db": "max_ram"
+  },
+  {
+    "csv": "usageType",
+    "db": null
+  }
+]
