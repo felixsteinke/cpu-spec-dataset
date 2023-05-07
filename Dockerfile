@@ -5,7 +5,7 @@ COPY dataset-api/pom.xml .
 RUN mvn dependency:go-offline
 
 COPY dataset-api/src/ /app/src/
-COPY dataset/* /app/src/main/resources/dataset
+COPY dataset/* /app/src/main/resources/dataset/
 
 RUN mvn package -DskipTests
 
