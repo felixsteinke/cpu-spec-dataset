@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public abstract class CpuSpecificationParser {
     /**
@@ -23,23 +25,36 @@ public abstract class CpuSpecificationParser {
         if (titleElement == null) {
             throw new ElementNotFoundException("Specification Page", "div.product-family-title-text > h1");
         }
+        specification.id = selectId(url);
         specification.cpuName = titleElement.text();
         specification.manufacturerName = "intel";
-        specification.productCollection = selectText(page, "span.value[data-key=ProductGroup] > a");
-        specification.totalCores = selectText(page, "span.value[data-key=CoreCount]");
-        specification.totalThreads = selectText(page, "span.value[data-key=ThreadCount]");
-        specification.baseFrequency = selectText(page, "span.value[data-key=ClockSpeed]");
-        specification.turboFrequency = selectText(page, "span.value[data-key=ClockSpeedMax]");
-        specification.defaultTdp = selectText(page, "span.value[data-key=MaxTDP]");
-        specification.launchDate = selectText(page, "span.value[data-key=BornOnDate]");
-        specification.maxRam = selectText(page, "span.value[data-key=MaxMem]");
-        specification.usageType = selectText(page, "span.value[data-key=CertifiedUseConditions]");
+        specification.sourceUrl = url;
 
+        for (Element dataSpan : page.select("span.value[data-key]")) {
+            String dataKey = dataSpan.attr("data-key");
+            if (isKeyIgnored(dataKey)){
+                continue;
+            }
+            String dataValue = dataSpan.text().trim();
+
+            if (dataValue.isBlank()){
+                specification.dataValues.put(dataKey, null);
+                continue;
+            }
+            specification.dataValues.put(dataKey, dataValue);
+        }
         return specification;
     }
 
-    private static String selectText(Document document, String cssQuery) {
-        Element element = document.selectFirst(cssQuery);
-        return element != null ? element.text() : null;
+    private static String selectId(String url){
+        try {
+            return new URI(url).getPath().trim().split("/")[7];
+        } catch (URISyntaxException e) {
+            return e.getClass().getSimpleName();
+        }
+    }
+
+    private static boolean isKeyIgnored(String key){
+        return key.equalsIgnoreCase("DatasheetUrl");
     }
 }

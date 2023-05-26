@@ -1,16 +1,14 @@
 package cpu.spec.scraper;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CpuSpecificationModel {
+    public String id;
     public String cpuName;
     public String manufacturerName;
-    public String productCollection;
-    public String totalCores;
-    public String totalThreads;
-    public String baseFrequency;
-    public String turboFrequency;
-    public String defaultTdp;
-    public String launchDate;
-    public String maxRam;
-    public String usageType;
+    public String sourceUrl;
+
+    public Map<String, String> dataValues = new HashMap<>();
 }
