@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class CsvMapper {
+
     /**
      * @param csvLines     raw data
      * @param mapping      mapping from configuration
@@ -34,7 +35,7 @@ public abstract class CsvMapper {
         }).collect(Collectors.toList());
     }
 
-    private static String getValue(String[] row, List<Integer> columnIndex, Function<String, String> modification) {
+    private static String getValue(String[] row, int[] columnIndex, Function<String, String> modification) {
         if (columnIndex == null) {
             return null;
         }

@@ -42,12 +42,14 @@ public class ApiController {
         if (!deferDbInit) {
             LOGGER.info("Start importing CSV Datasets");
             try {
-                CsvColumnIndexMapping intelMapping = getCsvMapping(INTEL_MAPPING);
-                CsvColumnModification intelModification = new CsvColumnModification();
-                CsvColumnIndexMapping amdMapping = getCsvMapping(AMD_MAPPING);
-                CsvColumnModification amdModification = new CsvColumnModification();
-                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(getCsvLines(INTEL_DATASET_CSV), intelMapping, intelModification));
-                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(getCsvLines(AMD_DATASET_CSV), amdMapping, amdModification));
+                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(
+                        getCsvLines(INTEL_DATASET_CSV),
+                        CsvColumnIndexMapping.Intel(),
+                        CsvColumnModification.Intel()));
+                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(
+                        getCsvLines(AMD_DATASET_CSV),
+                        CsvColumnIndexMapping.AMD(),
+                        CsvColumnModification.AMD()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

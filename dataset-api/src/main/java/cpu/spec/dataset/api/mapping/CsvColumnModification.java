@@ -12,5 +12,20 @@ public class CsvColumnModification {
     Function<String, String> maxFrequency;
     Function<String, String> tdp;
     Function<String, String> launchDate;
-    Function<String, String> maxRam = (s -> s.replaceAll(" GB", ""));
+    Function<String, String> maxRam;
+
+    private CsvColumnModification() {
+    }
+
+    public static CsvColumnModification AMD() {
+        CsvColumnModification modification = new CsvColumnModification();
+        modification.maxRam = (s -> s.replaceAll(" GB", ""));
+        return modification;
+    }
+
+    public static CsvColumnModification Intel() {
+        CsvColumnModification modification = new CsvColumnModification();
+        modification.maxRam = (s -> s.replaceAll(" GB", ""));
+        return modification;
+    }
 }
