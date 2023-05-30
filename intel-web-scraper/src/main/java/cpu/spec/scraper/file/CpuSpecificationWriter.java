@@ -16,18 +16,16 @@ public abstract class CpuSpecificationWriter {
         try (FileWriter writer = new FileWriter(filePath)) {
             List<String> keySequence = getKeySequence(cpuSpecifications);
 
-            writer.append(String.format("\"%s\",\"%s\",\"%s\",%s,\"%s\"\n",
+            writer.append(String.format("%s,\"%s\",%s,\"%s\"\n",
                     "CpuId",
                     "CpuName",
-                    "ManufacturerName",
                     writeKeyValues(keySequence),
                     "SourceUrl"));
 
             for (CpuSpecificationModel spec : cpuSpecifications) {
-                writer.append(String.format("\"%s\",\"%s\",\"%s\",%s,\"%s\"\n",
+                writer.append(String.format("%s,\"%s\",%s,\"%s\"\n",
                         spec.id,
                         spec.cpuName,
-                        spec.manufacturerName,
                         writeMapValues(keySequence, spec.dataValues),
                         spec.sourceUrl));
             }
@@ -47,22 +45,31 @@ public abstract class CpuSpecificationWriter {
     private static String writeKeyValues(List<String> keySequence){
         StringBuilder stringBuilder = new StringBuilder();
         for (String key : keySequence) {
-            stringBuilder.append("\"").append(key).append("\",");
+            if (key == null){
+                stringBuilder.append(",");
+            } else {
+                stringBuilder.append(key.replaceAll(",", ".")).append(",");
+            }
         }
         if (stringBuilder.isEmpty()){
             return "";
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 2);
+        return stringBuilder.substring(0, stringBuilder.length() - 1);
     }
 
     private static String writeMapValues(List<String> keySequence, Map<String, String> values){
         StringBuilder stringBuilder = new StringBuilder();
         for (String key : keySequence) {
-            stringBuilder.append("\"").append(values.get(key)).append("\",");
+            String value = values.get(key);
+            if (value == null){
+                stringBuilder.append(",");
+            } else {
+                stringBuilder.append(value.replaceAll(",", ".")).append(",");
+            }
         }
         if (stringBuilder.isEmpty()){
             return "";
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 2);
+        return stringBuilder.substring(0, stringBuilder.length() - 1);
     }
 }

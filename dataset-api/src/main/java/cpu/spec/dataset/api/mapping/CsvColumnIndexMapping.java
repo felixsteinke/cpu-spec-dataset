@@ -2,7 +2,6 @@ package cpu.spec.dataset.api.mapping;
 
 public class CsvColumnIndexMapping {
     int[] name;
-    int[] manufacturer;
     int[] productCollection;
     int[] cores;
     int[] threads;
@@ -15,10 +14,12 @@ public class CsvColumnIndexMapping {
     private CsvColumnIndexMapping() {
     }
 
+    /**
+     * @return column mapping with fallbacks for amd cpu data (readonly)
+     */
     public static CsvColumnIndexMapping AMD() {
         CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
         mapping.name = new int[]{2};
-        mapping.manufacturer = new int[]{};
         mapping.productCollection = new int[]{4};
         mapping.cores = new int[]{10};
         mapping.threads = new int[]{11};
@@ -30,18 +31,20 @@ public class CsvColumnIndexMapping {
         return mapping;
     }
 
+    /**
+     * @return column mapping with fallbacks for intel cpu data (readonly)
+     */
     public static CsvColumnIndexMapping Intel() {
         CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
         mapping.name = new int[]{1};
-        mapping.manufacturer = new int[]{2};
-        mapping.productCollection = new int[]{180};
-        mapping.cores = new int[]{34};
-        mapping.threads = new int[]{223};
-        mapping.baseFrequency = new int[]{27};
-        mapping.maxFrequency = new int[]{28, 20};
-        mapping.tdp = new int[]{140, 30, 32};
-        mapping.launchDate = new int[]{18, 69};
-        mapping.sourceUrl = new int[]{246};
+        mapping.productCollection = new int[]{179};
+        mapping.cores = new int[]{33};
+        mapping.threads = new int[]{222};
+        mapping.baseFrequency = new int[]{26};
+        mapping.maxFrequency = new int[]{27, 19};
+        mapping.tdp = new int[]{139, 29, 31, 194};
+        mapping.launchDate = new int[]{17, 68};
+        mapping.sourceUrl = new int[]{245};
         return mapping;
     }
 }

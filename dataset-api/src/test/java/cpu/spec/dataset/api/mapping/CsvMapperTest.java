@@ -15,6 +15,7 @@ class CsvMapperTest {
     void mapAmdDataset() throws IOException {
         List<CpuSpecification> actual = CsvMapper.mapToObjects(
                 ResourceReader.getAmdDataset(),
+                ResourceReader.getAmdColumns(),
                 CsvColumnIndexMapping.AMD(),
                 CsvColumnModification.AMD());
         assertNotNull(actual);
@@ -24,6 +25,7 @@ class CsvMapperTest {
     void mapIntelDataset() throws IOException {
         List<CpuSpecification> actual = CsvMapper.mapToObjects(
                 ResourceReader.getIntelDataset(),
+                ResourceReader.getIntelColumns(),
                 CsvColumnIndexMapping.Intel(),
                 CsvColumnModification.Intel());
         assertNotNull(actual);

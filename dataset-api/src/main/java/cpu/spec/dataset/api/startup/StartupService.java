@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Service
 public class StartupService {
@@ -32,30 +31,32 @@ public class StartupService {
     @EventListener(ApplicationReadyEvent.class)
     public void updateDatabaseAfterStartup() {
         if (!deferDbInit) {
-            LOGGER.info("Start importing CSV Datasets");
+            LOGGER.info("Start importing CSV datasets.");
             try {
                 List<CpuSpecification> intelSpecs = CsvMapper.mapToObjects(
-                        ResourceReader.getIntelDataset(),
-                        CsvColumnIndexMapping.Intel(),
-                        CsvColumnModification.Intel());
+                                ResourceReader.getIntelDataset(),
+                                ResourceReader.getIntelColumns(),
+                                CsvColumnIndexMapping.Intel(),
+                                CsvColumnModification.Intel())
+                        .stream().peek(spec -> spec.setManufacturer("intel")).toList();
                 List<CpuSpecification> amdSpecs = CsvMapper.mapToObjects(
-                        ResourceReader.getAmdDataset(),
-                        CsvColumnIndexMapping.AMD(),
-                        CsvColumnModification.AMD());
-                LOGGER.info("Saving all objects to the database");
+                                ResourceReader.getAmdDataset(),
+                                ResourceReader.getAmdColumns(),
+                                CsvColumnIndexMapping.AMD(),
+                                CsvColumnModification.AMD())
+                        .stream().peek(spec -> {
+                            spec.setManufacturer("amd");
+                            spec.setSourceUrl("https://www.amd.com/en/products/specifications/processors");
+                        }).toList();
+                LOGGER.fine("Saving all objects to the database.");
                 cpuSpecRepo.saveAll(intelSpecs);
                 cpuSpecRepo.saveAll(amdSpecs);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            LOGGER.info("Finished importing CSV Datasets");
+            LOGGER.info("Finished importing CSV datasets.");
+        } else {
+            LOGGER.info("Skipped CSV dataset import.");
         }
-    }
-
-    private List<CpuSpecification> enrichAmdData(List<CpuSpecification> amdData) {
-        return amdData.stream().peek(obj -> {
-            obj.setManufacturer("amd");
-            obj.setSourceUrl("https://www.amd.com/en/products/specifications/processors");
-        }).collect(Collectors.toList());
     }
 }

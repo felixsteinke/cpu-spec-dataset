@@ -24,7 +24,7 @@ cd dataset-api
 mvn spring-boot:run
 ```
 
-Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset` (e.g. [test_api.http](test_api.http))
+Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 
 <details>
   <summary>Configurations</summary>
@@ -69,18 +69,10 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 
 ## Dataset Update
 
-<details>
-  <summary>Mapping Configuration</summary>
+All updates to the dataset need to carefully reviewed. The column mappings and modifications need to be adjusted.
 
-[dataset-api/mapping](dataset-api/src/main/resources/mapping)
-
-```
-{
-  "entityField": [csvIndex, csvFallbackIndex]
-}
-```
-
-</details>
+* [dataset-api/mapping](dataset-api/src/main/java/cpu/spec/dataset/api/mapping/CsvColumnIndexMapping.java)
+* [dataset-api/modification](dataset-api/src/main/java/cpu/spec/dataset/api/mapping/CsvColumnModification.java)
 
 ### [Intel Dataset](dataset/intel-cpus.csv)
 

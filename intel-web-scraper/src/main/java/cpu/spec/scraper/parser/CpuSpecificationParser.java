@@ -27,7 +27,6 @@ public abstract class CpuSpecificationParser {
         }
         specification.id = selectId(url);
         specification.cpuName = titleElement.text();
-        specification.manufacturerName = "intel";
         specification.sourceUrl = url;
 
         for (Element dataSpan : page.select("span.value[data-key]")) {
