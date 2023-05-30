@@ -2,13 +2,13 @@ package cpu.spec.dataset.api.mapping;
 
 import cpu.spec.dataset.api.CpuSpecification;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class CsvMapper {
-
     /**
      * @param csvLines     raw data
      * @param mapping      mapping from configuration
@@ -28,9 +28,7 @@ public abstract class CsvMapper {
             specification.setBaseFrequency(getValue(row, mapping.baseFrequency, modification.baseFrequency));
             specification.setMaxFrequency(getValue(row, mapping.maxFrequency, modification.maxFrequency));
             specification.setTdp(getValue(row, mapping.tdp, modification.tdp));
-            specification.setLaunchDate(getValue(row, mapping.launchDate, modification.launchDate));
-            specification.setMaxRam(getValue(row, mapping.maxRam, modification.maxRam));
-
+            specification.setLaunchDate(getDateValue(row, mapping.launchDate));
             return specification;
         }).collect(Collectors.toList());
     }
@@ -49,6 +47,13 @@ public abstract class CsvMapper {
                     return modification.apply(value);
                 }
             }
+        }
+        return null;
+    }
+
+    private static LocalDate getDateValue(String[] row, int[] columnIndex) {
+        if (columnIndex == null) {
+            return null;
         }
         return null;
     }
