@@ -97,4 +97,44 @@ public class CsvColumnModification {
         modification.sourceUrl = (s -> s.substring(1, s.length() - 1));
         return modification;
     }
+
+    public static CsvColumnModification CpuBenchmark() {
+        CsvColumnModification modification = new CsvColumnModification();
+        modification.name = (s -> s.replaceAll("\"", ""));
+
+        Function<String, String> frequencyFunction = (s -> {
+            if (s.contains("GHz")) {
+                s = s.replaceAll("GHz", "").trim();
+                if (s.endsWith(".0")){
+                    s = s.substring(0, s.length() - 2);
+                }
+                int mhz = (int) Float.parseFloat(s) * 1000;
+                return Integer.toString(mhz);
+            } else if (s.contains("MHz")) {
+                return s.replaceAll("MHz", "").trim();
+            } else {
+                return s;
+            }
+        });
+        modification.baseFrequency = frequencyFunction;
+        modification.maxFrequency = frequencyFunction;
+        modification.launchDate = (s -> {
+            Matcher matcher = Pattern.compile("\\d{4}").matcher(s);
+            if (matcher.find()) {
+                return matcher.group();
+            } else {
+                return null;
+            }
+        });
+        modification.tdp = (s -> {
+            Matcher matcher = Pattern.compile("\\d+").matcher(s);
+            if (matcher.find()) {
+                return matcher.group();
+            } else {
+                return null;
+            }
+        });
+        return modification;
+    }
+
 }

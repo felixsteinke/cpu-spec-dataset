@@ -39,38 +39,38 @@ public class ScraperApp {
 
 
     public static List<CpuSpecificationModel> extractSpecifications(List<String> specificationLinks) {
-        int NUM_THREADS = 8; // Number of threads to use
-        List<CpuSpecificationModel> specifications = new ArrayList<>();
-
+        // Number of threads to use
+        int NUM_THREADS = 12;
+        // setup
         ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+        List<CpuSpecificationModel> specifications = new ArrayList<>();
         List<Future<CpuSpecificationModel>> futures = new ArrayList<>();
-
+        // submit extractions
         for (String link : specificationLinks) {
             String fullLink = "https://www.cpubenchmark.net/" + link;
             Callable<CpuSpecificationModel> task = () -> CpuSpecificationParser.extractSpecification(fullLink);
             Future<CpuSpecificationModel> future = executor.submit(task);
             futures.add(future);
         }
-
+        // collect extractions
         for (Future<CpuSpecificationModel> future : futures) {
             try {
                 CpuSpecificationModel spec = future.get();
                 specifications.add(spec);
-                if (specifications.size() % 25 == 0) {
+                if (specifications.size() % 250 == 0) {
                     System.out.println("[PROGRESS] Extracted " + specifications.size() + " CPU Specifications.");
                 }
             } catch (Exception e) {
                 System.out.println("[" + e.getClass().getSimpleName() + "]: " + e.getMessage());
             }
         }
-
+        // cleanup
         executor.shutdown();
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return specifications;
     }
 }

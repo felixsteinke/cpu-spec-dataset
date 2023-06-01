@@ -96,3 +96,13 @@ from [https://www.amd.com/en/products/specifications/processors](https://www.amd
 ![amd-csv-export](.docs/amd-csv-export.png)
 
 </details>
+
+### [CPU Benchmark](dataset/benchmark-cpus.csv)
+
+Extracted from [https://www.cpubenchmark.net/cpu_list.php](https://www.cpubenchmark.net/cpu_list.php)
+with the __Benchmark Web Scraper__.
+
+```shell
+cd benchmark-web-scraper
+mvn exec:java
+```

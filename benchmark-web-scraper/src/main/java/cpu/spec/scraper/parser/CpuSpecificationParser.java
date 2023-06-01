@@ -45,7 +45,14 @@ public abstract class CpuSpecificationParser {
         if (coresThreadsElement != null) {
             String[] values = coresThreadsElement.ownText().trim().split(" ");
             specification.cores = values[0];
-            specification.threads = values[1];
+            if (values.length == 2){
+                specification.threads = values[1];
+            }
+        }
+
+        Element tdpElement = page.selectFirst("div.left-desc-cpu > p:contains(TDP)");
+        if (tdpElement != null) {
+            specification.tdp = tdpElement.ownText().trim();
         }
 
         Element releaseDateElement = page.selectFirst("div.desc-foot > p.alt:contains(CPU First Seen on Charts)");

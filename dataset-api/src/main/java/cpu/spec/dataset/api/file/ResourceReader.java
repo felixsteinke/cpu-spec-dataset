@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 public abstract class ResourceReader {
     public static final String INTEL_DATASET_CSV = "dataset/intel-cpus.csv";
     public static final String AMD_DATASET_CSV = "dataset/amd-cpus.csv";
+    public static final String BENCHMARK_DATASET_CSV = "dataset/benchmark-cpus.csv";
 
     /**
      * @return map of (columnIndex, csvHeader)
@@ -31,6 +32,14 @@ public abstract class ResourceReader {
     }
 
     /**
+     * @return map of (columnIndex, csvHeader)
+     * @throws IOException if input stream is null
+     */
+    public static Map<Integer, String> getCpuBenchmarkColumns() throws IOException {
+        return getCsvColumns(getCpuBenchmarkDataset());
+    }
+
+    /**
      * @return csv lines of AMD dataset
      * @throws IOException if input stream is null
      */
@@ -44,6 +53,14 @@ public abstract class ResourceReader {
      */
     public static Stream<String> getIntelDataset() throws IOException {
         return getCsvLines(INTEL_DATASET_CSV);
+    }
+
+    /**
+     * @return csv lines of cpu benchmark dataset
+     * @throws IOException if input stream is null
+     */
+    public static Stream<String> getCpuBenchmarkDataset() throws IOException {
+        return getCsvLines(BENCHMARK_DATASET_CSV);
     }
 
     /**
