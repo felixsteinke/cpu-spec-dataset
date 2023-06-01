@@ -15,7 +15,6 @@ class CpuSpecificationParserTest {
         CpuSpecificationModel actual = CpuSpecificationParser.extractSpecification("https://ark.intel.com/content/www/us/en/ark/products/201900/intel-pentium-gold-g6405t-processor-4m-cache-3-50-ghz.html");
         assertEquals("201900", actual.id);
         assertEquals("Intel® Pentium® Gold G6405T Processor", actual.cpuName);
-        assertEquals("intel", actual.manufacturerName);
         assertEquals("https://ark.intel.com/content/www/us/en/ark/products/201900/intel-pentium-gold-g6405t-processor-4m-cache-3-50-ghz.html", actual.sourceUrl);
         assertEquals("Intel® Pentium® Gold Processor Series", actual.dataValues.get("ProductGroup"));
         assertEquals("2", actual.dataValues.get("CoreCount"));

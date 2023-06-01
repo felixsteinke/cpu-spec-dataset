@@ -1,57 +1,65 @@
 package cpu.spec.dataset.api;
 
 import cpu.spec.dataset.api.database.CpuSpecificationRepo;
-import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
-import cpu.spec.dataset.api.mapping.CsvColumnModification;
-import cpu.spec.dataset.api.mapping.CsvMapper;
+import cpu.spec.dataset.api.exception.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
-
-import static cpu.spec.dataset.api.file.ResourceReader.*;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/cpu-dataset")
 public class ApiController {
     private final Logger LOGGER = Logger.getLogger(ApiController.class.getName());
-    private final Boolean deferDbInit;
     private final CpuSpecificationRepo cpuSpecRepo;
 
     @Autowired
-    public ApiController(@Value("${spring.jpa.defer-datasource-initialization}") String deferDbInit,
-                         CpuSpecificationRepo cpuSpecRepo) {
-        this.deferDbInit = Boolean.parseBoolean(deferDbInit);
+    public ApiController(CpuSpecificationRepo cpuSpecRepo) {
         this.cpuSpecRepo = cpuSpecRepo;
     }
 
-    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CpuSpecification> getCpuSpecification(@RequestParam("cpu") String cpuName) {
-        LOGGER.info("Request cpu specification (cpu=" + cpuName + ")");
+    @GetMapping(path = "/equals/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CpuSpecification> getCpuSpecificationEquals(@PathVariable("name") String cpuName) {
+        LOGGER.info("Request cpu specification equals (cpu=" + cpuName + ")");
         return ResponseEntity.ok(cpuSpecRepo.findById(cpuName).orElseThrow());
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void updateDatabaseAfterStartup() {
-        if (!deferDbInit) {
-            LOGGER.info("Start importing CSV Datasets");
-            try {
-                CsvColumnIndexMapping intelMapping = getCsvMapping(INTEL_MAPPING);
-                CsvColumnModification intelModification = new CsvColumnModification();
-                CsvColumnIndexMapping amdMapping = getCsvMapping(AMD_MAPPING);
-                CsvColumnModification amdModification = new CsvColumnModification();
-                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(getCsvLines(INTEL_DATASET_CSV), intelMapping, intelModification));
-                cpuSpecRepo.saveAll(CsvMapper.mapToObjects(getCsvLines(AMD_DATASET_CSV), amdMapping, amdModification));
-            } catch (Exception e) {
-                e.printStackTrace();
+    @GetMapping(path = "/like/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CpuSpecification>> getCpuSpecificationsLike(@PathVariable("name") String cpuName) {
+        LOGGER.info("Request cpu specifications like (cpu=" + cpuName + ")");
+        return ResponseEntity.ok(cpuSpecRepo.findByName(cpuName));
+    }
+
+    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CpuSpecification> getCpuSpecificationByConditions(@RequestParam("condition") List<String> cpuNameConditions) throws NonUniqueResultException {
+        LOGGER.info("Request cpu specification with (conditions=" + cpuNameConditions + ")");
+        List<String> conditions = cpuNameConditions.stream().map(String::toLowerCase).toList();
+        List<String> results = new ArrayList<>();
+        for (String cpuName: cpuSpecRepo.findDistinctNames()) {
+            boolean isResult = true;
+            String name = cpuName.toLowerCase();
+            for (String condition: conditions) {
+                if (!name.contains(condition)){
+                    isResult = false;
+                    break;
+                }
             }
-            LOGGER.info("Finished importing CSV Datasets");
+            if (isResult){
+                results.add(cpuName);
+            }
+        }
+        if (results.size() == 1){
+            return ResponseEntity.ok(cpuSpecRepo.findById(results.get(0)).orElseThrow());
+        } else if (results.size() == 0){
+            throw new NoSuchElementException("Conditions dont match any name.");
+        } else {
+            throw new NonUniqueResultException(results);
         }
     }
 }

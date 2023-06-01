@@ -1,5 +1,0 @@
-# Test your FastAPI endpoints
-
-GET http://localhost:8080/api/cpu-dataset?cpu=Intel® Core™ i9-9960X X-series Processor
-Content-Type: application/json
-Accept: application/json
