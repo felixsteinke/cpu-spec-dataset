@@ -7,6 +7,7 @@ Dataset for CPU specifications from Intel and AMD.
 * [Raw Dataset](dataset)
 * [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
 * [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper)
+* [Benchmark Web Scraper](benchmark-web-scraper/src/main/java/cpu/spec/scraper)
 
 ## Installation
 
@@ -106,3 +107,16 @@ with the __Benchmark Web Scraper__.
 cd benchmark-web-scraper
 mvn exec:java
 ```
+
+To update all links for the cpus, the [cpu_mega_page.html](benchmark-web-scraper/src/main/resources/cpu_mega_page.html)
+needs to be updated manually.
+
+<details>
+  <summary>Website Screenshot where to Copy the HTML</summary>
+
+1. [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html) > `Show ALL entries`
+2. Open Dev Tools for Browser HTML (F12)
+
+![cpu-benchmark-table-copy](.docs/cpu-benchmark-table-copy.png)
+
+</details>

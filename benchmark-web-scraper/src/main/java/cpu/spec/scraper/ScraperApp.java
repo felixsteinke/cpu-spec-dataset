@@ -26,8 +26,7 @@ public class ScraperApp {
         }
 
         System.out.println("[INFO] Starting CPU Benchmark Web Scraper.");
-
-        List<String> specificationLinks = CpuListParser.extractSpecificationLinks("https://www.cpubenchmark.net/cpu_list.php");
+        List<String> specificationLinks = CpuListParser.extractSpecificationLinks("cpu_mega_page.html");
         System.out.println("[INFO] Extracted " + specificationLinks.size() + " CPU Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);

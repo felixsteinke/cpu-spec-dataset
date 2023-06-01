@@ -13,7 +13,7 @@ class CpuListParserTest {
 
     @Test
     void testExtractSpecificationLinks() throws ElementNotFoundException, IOException {
-        List<String> actual = CpuListParser.extractSpecificationLinks("https://www.cpubenchmark.net/cpu_list.php");
+        List<String> actual = CpuListParser.extractSpecificationLinks("cpu_mega_page.html");
         assertTrue(actual.size() >= 4200, "size >= 14");
         assertTrue(actual.get(0).contains("cpu.php?cpu="), "sample contains 'cpu.php?cpu='");
     }
