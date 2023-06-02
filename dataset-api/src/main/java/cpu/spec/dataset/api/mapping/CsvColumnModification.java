@@ -98,6 +98,9 @@ public class CsvColumnModification {
         return modification;
     }
 
+    /**
+     * @return modifications for cpu benchmark data (readonly)
+     */
     public static CsvColumnModification CpuBenchmark() {
         CsvColumnModification modification = new CsvColumnModification();
         modification.name = (s -> s.replaceAll("\"", ""));
@@ -105,7 +108,7 @@ public class CsvColumnModification {
         Function<String, String> frequencyFunction = (s -> {
             if (s.contains("GHz")) {
                 s = s.replaceAll("GHz", "").trim();
-                if (s.endsWith(".0")){
+                if (s.endsWith(".0")) {
                     s = s.substring(0, s.length() - 2);
                 }
                 int mhz = (int) Float.parseFloat(s) * 1000;
