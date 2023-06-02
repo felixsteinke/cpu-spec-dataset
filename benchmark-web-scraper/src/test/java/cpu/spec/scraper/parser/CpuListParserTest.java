@@ -25,6 +25,6 @@ class CpuListParserTest {
 
     @Test
     void testInvalidUrl() {
-        assertThrows(ElementNotFoundException.class, () -> CpuListParser.extractSpecificationLinks("https://google.com"));
+        assertThrows(IOException.class, () -> CpuListParser.extractSpecificationLinks("https://google.com"));
     }
 }

@@ -37,11 +37,8 @@ Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 | `spring.datasource.url`                      | `jdbc:mysql://localhost:3306/cpu_db`  | Full url to a MySQL database       |
 | `spring.datasource.username`                 | `root`                                | Username and usually root          |
 | `spring.datasource.password`                 | `password`                            | Custom password                    |
-| `spring.jpa.properties.hibernate.dialect`    | `org.hibernate.dialect.MySQL8Dialect` |                                    |
 | `spring.jpa.hibernate.ddl-auto`              | `update` or `validate`                | Table schema update mode           |
 | `spring.jpa.defer-datasource-initialization` | `false` or `true`                     | Defer database update with dataset |
-| `logging.level.root`                         | `INFO` or `DEBUG`                     |                                    |
-| `spring.jpa.show-sql`                        | `false` or `true`                     |                                    |
 
 </details>
 

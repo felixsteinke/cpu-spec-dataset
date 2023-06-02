@@ -22,13 +22,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Void> handleNoSuchElementException(HttpServletRequest request, NoSuchElementException exception) {
+        LOGGER.warning(exception.getClass().getSimpleName() + ": " + exception.getMessage() + " (from: " + request.getRequestURI() + ")");
         logHandledException(request, exception);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     private void logHandledException(HttpServletRequest request, Exception exception) {
         if (printStackTrace) {
-            LOGGER.warning(exception.getClass().getSimpleName() + ": " + exception.getMessage() + " (from: " + request.getRequestURI() + ")");
             exception.printStackTrace();
         }
     }
