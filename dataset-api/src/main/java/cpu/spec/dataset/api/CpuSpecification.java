@@ -47,7 +47,7 @@ public class CpuSpecification {
     @Column(name = "tdp_qualifier")
     private String tdpQualifier;
     @Column(name = "launch_year")
-    private String launchYear;
+    private Integer launchYear;
     @Column(name = "launch_year_qualifier")
     private String launchYearQualifier;
     @Column(name = "source_url")
@@ -106,7 +106,11 @@ public class CpuSpecification {
     }
 
     public void setLaunchYear(String year) {
-        this.launchYear = year;
+        if (year == null){
+            this.launchYear = null;
+        } else {
+            this.launchYear = Integer.parseInt(year);
+        }
     }
 
     public void setSourceUrl(String sourceUrl) {

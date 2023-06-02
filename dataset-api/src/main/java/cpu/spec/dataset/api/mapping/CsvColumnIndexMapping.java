@@ -47,4 +47,21 @@ public class CsvColumnIndexMapping {
         mapping.sourceUrl = new int[]{245};
         return mapping;
     }
+
+    /**
+     * @return column mapping for cpu benchmark data (readonly)
+     */
+    public static CsvColumnIndexMapping CpuBenchmark(){
+        CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
+        mapping.name = new int[]{0};
+        mapping.productCollection = new int[]{};
+        mapping.cores = new int[]{4};
+        mapping.threads = new int[]{5};
+        mapping.baseFrequency = new int[]{2};
+        mapping.maxFrequency = new int[]{3};
+        mapping.tdp = new int[]{6};
+        mapping.launchDate = new int[]{7};
+        mapping.sourceUrl = new int[]{8};
+        return mapping;
+    }
 }

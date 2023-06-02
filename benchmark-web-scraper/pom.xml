@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cpu.spec</groupId>
-    <artifactId>intel-web-scraper</artifactId>
-    <name>intel-web-scraper</name>
-    <description>intel-web-scraper</description>
+    <artifactId>benchmark-web-scraper</artifactId>
+    <name>benchmark-web-scraper</name>
+    <description>benchmark-web-scraper</description>
     <version>1.0</version>
 
     <properties>

@@ -23,6 +23,7 @@
     <modules>
         <module>dataset-api</module>
         <module>intel-web-scraper</module>
+        <module>benchmark-web-scraper</module>
     </modules>
 
 </project>

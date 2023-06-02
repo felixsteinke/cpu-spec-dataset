@@ -38,7 +38,10 @@ public class StartupService {
                                 ResourceReader.getIntelColumns(),
                                 CsvColumnIndexMapping.Intel(),
                                 CsvColumnModification.Intel())
-                        .stream().peek(spec -> spec.setManufacturer("intel")).toList();
+                        .stream()
+                        .peek(spec -> spec.setManufacturer("intel"))
+                        .toList();
+
                 List<CpuSpecification> amdSpecs = CsvMapper.mapToObjects(
                                 ResourceReader.getAmdDataset(),
                                 ResourceReader.getAmdColumns(),
@@ -48,9 +51,26 @@ public class StartupService {
                             spec.setManufacturer("amd");
                             spec.setSourceUrl("https://www.amd.com/en/products/specifications/processors");
                         }).toList();
+
+                List<CpuSpecification> benchmarkSpecs = CsvMapper.mapToObjects(
+                                ResourceReader.getCpuBenchmarkDataset(),
+                                ResourceReader.getCpuBenchmarkColumns(),
+                                CsvColumnIndexMapping.CpuBenchmark(),
+                                CsvColumnModification.CpuBenchmark())
+                        .stream()
+                        .peek(spec -> {
+                            String name = spec.getName().toLowerCase();
+                            if (name.contains("intel")) {
+                                spec.setManufacturer("intel");
+                            } else if (name.contains("amd")) {
+                                spec.setManufacturer("amd");
+                            }
+                        }).toList();
+
                 LOGGER.fine("Saving all objects to the database.");
                 cpuSpecRepo.saveAll(intelSpecs);
                 cpuSpecRepo.saveAll(amdSpecs);
+                cpuSpecRepo.saveAll(benchmarkSpecs);
             } catch (Exception e) {
                 e.printStackTrace();
             }

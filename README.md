@@ -7,6 +7,7 @@ Dataset for CPU specifications from Intel and AMD.
 * [Raw Dataset](dataset)
 * [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
 * [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper)
+* [Benchmark Web Scraper](benchmark-web-scraper/src/main/java/cpu/spec/scraper)
 
 ## Installation
 
@@ -36,11 +37,8 @@ Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 | `spring.datasource.url`                      | `jdbc:mysql://localhost:3306/cpu_db`  | Full url to a MySQL database       |
 | `spring.datasource.username`                 | `root`                                | Username and usually root          |
 | `spring.datasource.password`                 | `password`                            | Custom password                    |
-| `spring.jpa.properties.hibernate.dialect`    | `org.hibernate.dialect.MySQL8Dialect` |                                    |
 | `spring.jpa.hibernate.ddl-auto`              | `update` or `validate`                | Table schema update mode           |
 | `spring.jpa.defer-datasource-initialization` | `false` or `true`                     | Defer database update with dataset |
-| `logging.level.root`                         | `INFO` or `DEBUG`                     |                                    |
-| `spring.jpa.show-sql`                        | `false` or `true`                     |                                    |
 
 </details>
 
@@ -94,5 +92,28 @@ from [https://www.amd.com/en/products/specifications/processors](https://www.amd
   <summary>Website Screenshot</summary>
 
 ![amd-csv-export](.docs/amd-csv-export.png)
+
+</details>
+
+### [CPU Benchmark](dataset/benchmark-cpus.csv)
+
+Extracted from [https://www.cpubenchmark.net/cpu_list.php](https://www.cpubenchmark.net/cpu_list.php)
+with the __Benchmark Web Scraper__.
+
+```shell
+cd benchmark-web-scraper
+mvn exec:java
+```
+
+To update all links for the cpus, the [cpu_mega_page.html](benchmark-web-scraper/src/main/resources/cpu_mega_page.html)
+needs to be updated manually.
+
+<details>
+  <summary>Website Screenshot where to Copy the HTML</summary>
+
+1. [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html) > `Show ALL entries`
+2. Open Dev Tools for Browser HTML (F12)
+
+![cpu-benchmark-table-copy](.docs/cpu-benchmark-table-copy.png)
 
 </details>
