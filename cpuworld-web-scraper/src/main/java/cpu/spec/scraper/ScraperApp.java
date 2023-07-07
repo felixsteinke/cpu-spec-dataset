@@ -8,6 +8,7 @@ import cpu.spec.scraper.parser.CpuOverviewParser;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
+import cpu.spec.scraper.utils.TimeUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class ScraperApp {
 
 
     private static List<CpuSpecificationModel> extractSelectedCpuSpecifications() {
-        List<String> specificationLinks = List.of("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8272CL.html");
+        List<String> specificationLinks = List.of("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html");
         LOGGER.info("Given " + specificationLinks.size() + " Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
@@ -52,7 +53,7 @@ public class ScraperApp {
         List<String> specificationLinks = extractNavigationLinks(familyLinks);
         LOGGER.info("Extracted " + specificationLinks.size() + " Specification Links.");
 
-        List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
+        List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks.stream().map(href -> HOST_URL + href).toList());
         LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
         return specifications;
     }
@@ -73,16 +74,16 @@ public class ScraperApp {
     private static List<CpuSpecificationModel> extractSpecifications(List<String> specificationLinks) {
         List<CpuSpecificationModel> specifications = new ArrayList<>();
         for (String link : specificationLinks) {
-            String fullLink = HOST_URL + link;
             try {
-                specifications.add(CpuSpecificationParser.extractSpecification(fullLink));
+                specifications.add(CpuSpecificationParser.extractSpecification(link));
                 if (specifications.size() % 250 == 0) {
                     LOGGER.info("Extracted " + specifications.size() + " of " + specificationLinks.size() + " CPU Specifications.");
                 }
             } catch (Exception e) {
-                LOGGER.warning(buildExceptionMessage(e, fullLink));
+                LOGGER.warning(buildExceptionMessage(e, link));
             }
         }
+        TimeUtils.sleepBetween(10000, 3000);
         return specifications;
     }
 
