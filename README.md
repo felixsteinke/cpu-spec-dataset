@@ -79,7 +79,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd intel-web-scraper
-mvn exec:java
+java -jar ./target/exectuable.jar
 ```
 
 ### [AMD Dataset](dataset/amd-cpus.csv)
