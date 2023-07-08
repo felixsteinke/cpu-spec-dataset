@@ -2,8 +2,8 @@ package cpu.spec.scraper;
 
 import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
-import cpu.spec.scraper.parser.CpuListParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
+import cpu.spec.scraper.parser.MegaPageParser;
 import cpu.spec.scraper.utils.FileUtils;
 import cpu.spec.scraper.utils.LogUtils;
 
@@ -12,16 +12,15 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-public class ScraperApp {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
-    private static final String HOST_URL = "https://www.cpubenchmark.net/";
+public class BenchmarkScraperApp {
+    private static final Logger LOGGER = LoggerFactory.getLogger();
 
     public static void main(String[] args) throws Exception {
         LOGGER.info("Starting Cpu Benchmark Scraper.");
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "benchmark-cpus.csv";
 
-        List<String> specificationLinks = CpuListParser.extractSpecificationLinks();
+        List<String> specificationLinks = MegaPageParser.extractSpecificationLinks();
         LOGGER.info("Extracted " + specificationLinks.size() + " CPU Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
@@ -32,7 +31,7 @@ public class ScraperApp {
     }
 
 
-    public static List<CpuSpecificationModel> extractSpecifications(List<String> specificationLinks) {
+    private static List<CpuSpecificationModel> extractSpecifications(List<String> specificationLinks) {
         // Number of threads to use
         int NUM_THREADS = 12;
         // setup
@@ -41,18 +40,17 @@ public class ScraperApp {
         List<Future<CpuSpecificationModel>> futures = new ArrayList<>();
         // submit extractions
         for (String link : specificationLinks) {
-            String fullLink = HOST_URL + link;
-            Callable<CpuSpecificationModel> task = () -> CpuSpecificationParser.extractSpecification(fullLink);
+            Callable<CpuSpecificationModel> task = () -> CpuSpecificationParser.extractSpecification(link);
             Future<CpuSpecificationModel> future = executor.submit(task);
             futures.add(future);
         }
         // collect extractions
         for (Future<CpuSpecificationModel> future : futures) {
             try {
-                CpuSpecificationModel spec = future.get();
+                CpuSpecificationModel spec = future.get(); // blocking
                 specifications.add(spec);
                 if (specifications.size() % 250 == 0) {
-                    LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
+                    LOGGER.info(LogUtils.progressMessage(specifications, specificationLinks, "CPU Specifications"));
                 }
             } catch (Exception e) {
                 LOGGER.warning(LogUtils.exceptionMessage(e));
@@ -63,7 +61,8 @@ public class ScraperApp {
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.severe(LogUtils.exceptionMessage(e));
+            // e.printStackTrace();
         }
         return specifications;
     }

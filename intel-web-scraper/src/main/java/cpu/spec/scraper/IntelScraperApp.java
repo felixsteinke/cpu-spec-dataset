@@ -4,7 +4,7 @@ import cpu.spec.scraper.exception.DirectoryNotFoundException;
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
-import cpu.spec.scraper.parser.CpuProductScraper;
+import cpu.spec.scraper.parser.CpuProductParser;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class ScraperApp {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
+public class IntelScraperApp {
+    private static final Logger LOGGER = LoggerFactory.getLogger();
     private static final String HOST_URL = "https://ark.intel.com";
 
     public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
@@ -24,7 +24,7 @@ public class ScraperApp {
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "intel-cpus.csv";
 
-        List<String> seriesLinks = CpuProductScraper.extractSeriesLinks();
+        List<String> seriesLinks = CpuProductParser.extractSeriesLinks();
         LOGGER.info("Extracted " + seriesLinks.size() + " CPU Series Links.");
 
         List<String> specificationLinks = extractSpecificationLinks(seriesLinks);
@@ -57,7 +57,7 @@ public class ScraperApp {
             try {
                 specifications.add(CpuSpecificationParser.extractSpecification(fullLink));
                 if (specifications.size() % 250 == 0) {
-                    LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
+                    LOGGER.info(LogUtils.progressMessage(specifications, specificationLinks, "CPU Specifications"));
                 }
             } catch (Exception e) {
                 LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));

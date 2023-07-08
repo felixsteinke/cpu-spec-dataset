@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class ScraperApp {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
+public class CpuworldScraperApp {
+    private static final Logger LOGGER = LoggerFactory.getLogger();
     private static final String HOST_URL = "https://www.cpu-world.com";
 
     public static void main(String[] args) throws DirectoryNotFoundException, IOException {
@@ -78,7 +78,7 @@ public class ScraperApp {
             try {
                 specifications.add(CpuSpecificationParser.extractSpecification(link));
                 if (specifications.size() % 250 == 0) {
-                    LOGGER.info("Extracted " + specifications.size() + " of " + specificationLinks.size() + " CPU Specifications.");
+                    LOGGER.info(LogUtils.progressMessage(specifications, specificationLinks, "CPU Specifications"));
                 }
             } catch (Exception e) {
                 LOGGER.warning(LogUtils.exceptionMessage(e, link));

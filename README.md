@@ -12,11 +12,20 @@ Dataset for CPU specifications from Intel and AMD.
 
 ## Installation
 
-Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
+Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__.
+
+__Windows__:
+
+```shell
+xcopy .\dataset\ .\dataset-api\src\main\resources\dataset /s /e /h /y 
+mvn clean install -DskipTests
+```
+
+__Linux__:
 
 ```shell
 copy ./dataset/* ./dataset-api/src/main/resources/dataset/
-mvn clean compile
+mvn clean install -DskipTests
 ```
 
 ## Dataset API Usage
@@ -79,7 +88,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd intel-web-scraper
-mvn exec:java
+java -jar ./target/exectuable.jar
 ```
 
 ### [AMD Dataset](dataset/amd-cpus.csv)
@@ -101,7 +110,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd benchmark-web-scraper
-mvn exec:java
+java -jar ./target/exectuable.jar
 ```
 
 ### [CPU World Dataset](dataset/cpuworld-cpus.csv)
@@ -111,5 +120,5 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd cpuworld-web-scraper
-mvn exec:java
+mvn -jar ./target/exectuable.jar
 ```

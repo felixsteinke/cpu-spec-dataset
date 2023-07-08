@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CpuProductScraper {
+public abstract class CpuProductParser {
     private static final String ENTRY_URL = "https://ark.intel.com/content/www/us/en/ark.html#@Processors";
 
     /**
