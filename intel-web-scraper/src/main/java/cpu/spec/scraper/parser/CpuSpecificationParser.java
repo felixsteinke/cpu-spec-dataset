@@ -2,7 +2,8 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.exception.ElementNotFoundException;
-import org.jsoup.Jsoup;
+import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -18,25 +19,24 @@ public abstract class CpuSpecificationParser {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static CpuSpecificationModel extractSpecification(String url) throws IOException, ElementNotFoundException {
-        Document page = Jsoup.connect(url).get();
+        Document page = JsoupFactory.getConnection(url).get();
+        JsoupValidator validator = new JsoupValidator(url);
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
-        Element titleElement = page.selectFirst("div.product-family-title-text > h1");
-        if (titleElement == null) {
-            throw new ElementNotFoundException("Specification Page", "div.product-family-title-text > h1");
-        }
+        Element titleElement = validator.selectFirst(page, "div.product-family-title-text > h1");
+
         specification.id = selectId(url);
         specification.cpuName = titleElement.text();
         specification.sourceUrl = url;
 
         for (Element dataSpan : page.select("span.value[data-key]")) {
             String dataKey = dataSpan.attr("data-key");
-            if (isKeyIgnored(dataKey)){
+            if (isKeyIgnored(dataKey)) {
                 continue;
             }
             String dataValue = dataSpan.text().trim();
 
-            if (dataValue.isBlank()){
+            if (dataValue.isBlank()) {
                 specification.dataValues.put(dataKey, null);
                 continue;
             }
@@ -45,7 +45,7 @@ public abstract class CpuSpecificationParser {
         return specification;
     }
 
-    private static String selectId(String url){
+    private static String selectId(String url) {
         try {
             return new URI(url).getPath().trim().split("/")[7];
         } catch (URISyntaxException e) {
@@ -53,7 +53,7 @@ public abstract class CpuSpecificationParser {
         }
     }
 
-    private static boolean isKeyIgnored(String key){
+    private static boolean isKeyIgnored(String key) {
         return key.equalsIgnoreCase("DatasheetUrl");
     }
 }

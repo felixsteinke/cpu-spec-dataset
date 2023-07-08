@@ -16,7 +16,7 @@ Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
 
 ```shell
 copy ./dataset/* ./dataset-api/src/main/resources/dataset/
-mvn clean install
+mvn clean compile
 ```
 
 ## Dataset API Usage
@@ -68,16 +68,14 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 
 ## Dataset Update
 
-All updates to the dataset need to carefully reviewed. The column mappings and modifications need to be adjusted.
-
-* [dataset-api/mapping](dataset-api/src/main/java/cpu/spec/dataset/api/mapping/CsvColumnIndexMapping.java)
-* [dataset-api/modification](dataset-api/src/main/java/cpu/spec/dataset/api/mapping/CsvColumnModification.java)
+All updates to the dataset need to carefully reviewed. The column mappings and modifications need to be adjusted in the
+corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dataset) for the __Dataset API__.
 
 ### [Intel Dataset](dataset/intel-cpus.csv)
 
 Extracted from
 [https://ark.intel.com/content/www/us/en/ark.html](https://ark.intel.com/content/www/us/en/ark.html#@Processors)
-with the __Intel Web Scraper__.
+with the responsible __Web Scraper__.
 
 ```shell
 cd intel-web-scraper
@@ -86,7 +84,7 @@ mvn exec:java
 
 ### [AMD Dataset](dataset/amd-cpus.csv)
 
-__Export Data__ as __CSV/Excel__
+Manually __Export Data__ as __CSV/Excel__
 from [https://www.amd.com/en/products/specifications/processors](https://www.amd.com/en/products/specifications/processors)
 
 <details>
@@ -96,25 +94,22 @@ from [https://www.amd.com/en/products/specifications/processors](https://www.amd
 
 </details>
 
-### [CPU Benchmark](dataset/benchmark-cpus.csv)
+### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
 
 Extracted from [https://www.cpubenchmark.net/cpu_list.php](https://www.cpubenchmark.net/cpu_list.php)
-with the __Benchmark Web Scraper__.
+with the responsible __Web Scraper__.
 
 ```shell
 cd benchmark-web-scraper
 mvn exec:java
 ```
 
-To update all links for the cpus, the [cpu_mega_page.html](benchmark-web-scraper/src/main/resources/cpu_mega_page.html)
-needs to be updated manually.
+### [CPU World Dataset](dataset/cpuworld-cpus.csv)
 
-<details>
-  <summary>Website Screenshot where to Copy the HTML</summary>
+Extracted from [https://www.cpu-world.com/CPUs/CPU.html](https://www.cpu-world.com/CPUs/CPU.html)
+with the responsible __Web Scraper__.
 
-1. [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html) > `Show ALL entries`
-2. Open Dev Tools for Browser HTML (F12)
-
-![cpu-benchmark-table-copy](.docs/cpu-benchmark-table-copy.png)
-
-</details>
+```shell
+cd cpuworld-web-scraper
+mvn exec:java
+```

@@ -2,13 +2,12 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.factory.ChromeDriverFactory;
+import cpu.spec.scraper.validator.SeleniumValidator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-
-import static cpu.spec.scraper.validator.SeleniumValidator.validate;
 
 public abstract class CpuSpecificationParser {
 
@@ -19,6 +18,7 @@ public abstract class CpuSpecificationParser {
      */
     public static CpuSpecificationModel extractSpecification(String url) throws Exception {
         WebDriver driver = ChromeDriverFactory.getDriver();
+        SeleniumValidator validator = new SeleniumValidator(url);
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
         try {
@@ -38,11 +38,9 @@ public abstract class CpuSpecificationParser {
                 }
             }
             // Extract the specification table
-            WebElement infoDiv = driver.findElement(By.cssSelector("div#GET_INFO"));
-            validate(infoDiv, "page", "div#GET_INFO");
+            WebElement infoDiv = validator.findElement(driver, By.cssSelector("div#GET_INFO"));
 
-            WebElement specTable = infoDiv.findElement(By.cssSelector("table.spec_table"));
-            validate(specTable, "div#GET_INFO", "table.spec_table");
+            WebElement specTable = validator.findElement(infoDiv, By.cssSelector("table.spec_table"));
 
             // Iterate over each row of the table
             List<WebElement> tableRows = specTable.findElements(By.tagName("tr"));

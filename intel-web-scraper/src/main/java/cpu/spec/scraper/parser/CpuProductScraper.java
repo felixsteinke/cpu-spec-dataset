@@ -1,7 +1,8 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
-import org.jsoup.Jsoup;
+import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -11,19 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CpuProductScraper {
+    private static final String ENTRY_URL = "https://ark.intel.com/content/www/us/en/ark.html#@Processors";
+
     /**
-     * @param url <a href="https://ark.intel.com/content/www/us/en/ark.html#@PanelLabel122139">Intel Processor Product Page</a>
      * @return series links for sub routing
      * @throws IOException              if page cannot be retrieved
      * @throws ElementNotFoundException if element cannot be retrieved
      */
-    public static List<String> extractSeriesLinks(String url) throws IOException, ElementNotFoundException {
-        Document page = Jsoup.connect(url).get();
+    public static List<String> extractSeriesLinks() throws IOException, ElementNotFoundException {
+        Document page = JsoupFactory.getConnection(ENTRY_URL).get();
+        JsoupValidator validator = new JsoupValidator(ENTRY_URL);
 
-        Elements generationButtons = page.select("div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
-        if (generationButtons.isEmpty()) {
-            throw new ElementNotFoundException("Product Page", "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
-        }
+        Elements generationButtons = validator.select(page, "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
 
         List<String> seriesLinks = new ArrayList<>();
         for (Element generationBtn : generationButtons) {

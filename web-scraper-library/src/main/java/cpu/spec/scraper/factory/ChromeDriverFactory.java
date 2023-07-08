@@ -18,7 +18,7 @@ public abstract class ChromeDriverFactory {
      */
     public static ChromeDriver getDriver() {
         if (setup) {
-            LOGGER.info("Start setup chrome driver setup.");
+            LOGGER.info("Start chrome driver setup.");
             WebDriverManager.chromedriver().setup();
             setup = false;
             LOGGER.info("Finished chrome driver setup.");
