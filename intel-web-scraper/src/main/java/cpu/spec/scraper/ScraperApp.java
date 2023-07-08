@@ -18,14 +18,13 @@ import java.util.logging.Logger;
 public class ScraperApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
     private static final String HOST_URL = "https://ark.intel.com";
-    private static final String ENTRY_URL = "https://ark.intel.com/content/www/us/en/ark.html#@Processors";
 
     public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
         LOGGER.info("Starting Intel Scraper.");
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "intel-cpus.csv";
 
-        List<String> seriesLinks = CpuProductScraper.extractSeriesLinks(ENTRY_URL);
+        List<String> seriesLinks = CpuProductScraper.extractSeriesLinks();
         LOGGER.info("Extracted " + seriesLinks.size() + " CPU Series Links.");
 
         List<String> specificationLinks = extractSpecificationLinks(seriesLinks);

@@ -12,15 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CpuOverviewParser {
+    private static final String ENTRY_URL = "https://www.cpu-world.com/CPUs/CPU.html";
+
     /**
-     * @param url <a href="https://www.cpu-world.com/CPUs/CPU.html">CpuWorld Main Page</a>
      * @return series links for sub routing
      * @throws IOException              if page cannot be retrieved
      * @throws ElementNotFoundException if element cannot be retrieved
      */
-    public static List<String> extractNavigationLinks(String url) throws IOException, ElementNotFoundException {
-        Document page = JsoupFactory.getConnection(url).get();
-        JsoupValidator validator = new JsoupValidator(url);
+    public static List<String> extractNavigationLinks() throws IOException, ElementNotFoundException {
+        Document page = JsoupFactory.getConnection(ENTRY_URL).get();
+        JsoupValidator validator = new JsoupValidator(ENTRY_URL);
 
         Elements manufacturerTables = validator.select(page, "table.sh_table");
 

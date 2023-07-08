@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class ScraperApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
     private static final String HOST_URL = "https://www.cpu-world.com";
-    private static final String ENTRY_URL = "https://www.cpu-world.com/CPUs/CPU.html";
 
     public static void main(String[] args) throws DirectoryNotFoundException, IOException {
         LOGGER.info("Starting Cpu World Scraper.");
@@ -43,7 +42,7 @@ public class ScraperApp {
     }
 
     private static List<CpuSpecificationModel> extractAllCpuSpecifications() throws ElementNotFoundException, IOException {
-        List<String> overviewLinks = CpuOverviewParser.extractNavigationLinks(ENTRY_URL);
+        List<String> overviewLinks = CpuOverviewParser.extractNavigationLinks();
         LOGGER.info("Extracted " + overviewLinks.size() + " Overview Links.");
 
         List<String> seriesLinks = extractNavigationLinks(overviewLinks);
