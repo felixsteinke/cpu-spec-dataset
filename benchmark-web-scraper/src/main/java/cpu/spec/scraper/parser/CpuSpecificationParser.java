@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public abstract class CpuSpecificationParser {
     /**
-     * @param url <a href="https://www.cpubenchmark.net/cpu.php?cpu=Intel+Xeon+Platinum+8173M+%40+2.00GHz&id=3182">Cpu Benchmark Specification Page</a>
+     * @param url <a href="https://www.cpubenchmark.net/cpu.php?cpu=Intel Xeon Platinum 8173M @ 2.00GHz&id=3182">Cpu Benchmark Specification Page</a>
      * @return cpu specification model
      * @throws IOException              if page cannot be retrieved
      * @throws ElementNotFoundException if element cannot be retrieved

@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 public abstract class TimeUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger();
     private static long lastSleepTime = 0;
 
     public static void sleepBetween(long msBetween) {

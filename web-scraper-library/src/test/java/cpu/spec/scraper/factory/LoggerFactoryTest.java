@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 class LoggerFactoryTest {
     @Test
     void getLogger() {
-        Logger logger = LoggerFactory.getLogger(LoggerFactory.class);
+        Logger logger = LoggerFactory.getLogger();
         logger.fine("Test Debugging");
         logger.info("Test Information");
         logger.warning("Test Warning");

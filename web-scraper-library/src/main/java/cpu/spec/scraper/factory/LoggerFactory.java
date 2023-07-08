@@ -9,14 +9,11 @@ import java.util.logging.*;
 public abstract class LoggerFactory {
     private static final Level LOG_LEVEL = Level.ALL;
 
-    /**
-     * @param cls class where the logger is executed
-     * @return custom logger object
-     */
-    public static Logger getLogger(Class<?> cls) {
-        Logger logger = Logger.getLogger(cls.getClassLoader().getName());
-        logger.setLevel(LOG_LEVEL); // Set desired log level
-        logger.setUseParentHandlers(false);
+    private static final Logger LOGGER = Logger.getGlobal();
+
+    static {
+        LOGGER.setLevel(LOG_LEVEL); // Set desired log level
+        LOGGER.setUseParentHandlers(false);
         Formatter formatter = new Formatter() {
             @Override
             public String format(LogRecord record) {
@@ -31,7 +28,13 @@ public abstract class LoggerFactory {
         // Create a console handler and set the formatter
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(formatter);
-        logger.addHandler(consoleHandler);
-        return logger;
+        LOGGER.addHandler(consoleHandler);
+    }
+
+    /**
+     * @return custom logger object
+     */
+    public static Logger getLogger() {
+        return LOGGER;
     }
 }

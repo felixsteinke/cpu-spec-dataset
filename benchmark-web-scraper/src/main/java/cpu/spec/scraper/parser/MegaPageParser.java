@@ -13,11 +13,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CpuListParser {
+public abstract class MegaPageParser {
     private static final String ENTRY_URL = "https://www.cpubenchmark.net/CPU_mega_page.html";
 
     /**
-     * @return cpu links for sub routing (url decoded)
+     * @return cpu links for sub routing (url decoded = clean texts)
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static List<String> extractSpecificationLinks() throws Exception {
@@ -35,6 +35,7 @@ public abstract class CpuListParser {
             Thread.sleep(250);
 
             WebElement tableBody = validator.findElement(driver, By.cssSelector("#cputable > tbody"));
+
             List<WebElement> tableRows = validator.findElements(tableBody, By.cssSelector("tr"));
 
             for (WebElement row : tableRows) {
@@ -42,9 +43,13 @@ public abstract class CpuListParser {
                 if (aSpec == null) {
                     continue;
                 }
-                specificationLinks.add(URLDecoder.decode(aSpec.getAttribute("href").replaceAll("cpu_lookup.php", "cpu.php"), StandardCharsets.UTF_8));
+                String href = aSpec.getAttribute("href");
+                if (href == null) {
+                    continue;
+                }
+                href = href.replaceAll("cpu_lookup.php", "cpu.php");
+                specificationLinks.add(URLDecoder.decode(href, StandardCharsets.UTF_8));
             }
-
         } catch (Exception exception) {
             driver.quit();
             throw exception;

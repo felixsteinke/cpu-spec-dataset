@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * Factory to serve chrome drivers with a static evolving configuration.
  */
 public abstract class ChromeDriverFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChromeDriverFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger();
     private static boolean setup = true;
 
     /**
