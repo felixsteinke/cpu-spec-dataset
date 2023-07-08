@@ -16,7 +16,7 @@ Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
 
 ```shell
 copy ./dataset/* ./dataset-api/src/main/resources/dataset/
-mvn clean install
+mvn clean compile
 ```
 
 ## Dataset API Usage
