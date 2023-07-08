@@ -1,6 +1,5 @@
 package cpu.spec.dataset.api;
 
-import cpu.spec.dataset.api.database.CpuSpecificationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

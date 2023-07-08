@@ -1,7 +1,10 @@
 package cpu.spec.dataset.api.mapping;
 
 import cpu.spec.dataset.api.CpuSpecification;
-import cpu.spec.dataset.api.file.ResourceReader;
+import cpu.spec.dataset.api.dataset.AmdDataset;
+import cpu.spec.dataset.api.dataset.BenchmarkDataset;
+import cpu.spec.dataset.api.dataset.CpuworldDataset;
+import cpu.spec.dataset.api.dataset.IntelDataset;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,33 +17,28 @@ class CsvMapperTest {
 
     @Test
     void mapAmdDataset() throws IOException {
-        List<CpuSpecification> objects = CsvMapper.mapToObjects(
-                ResourceReader.getAmdDataset(),
-                ResourceReader.getAmdColumns(),
-                CsvColumnIndexMapping.AMD(),
-                CsvColumnModification.AMD());
+        List<CpuSpecification> objects = CsvMapper.mapToObjects(new AmdDataset());
         assertNotNull(objects);
         assertFalse(objects.isEmpty(), "objects are empty");
     }
 
     @Test
     void mapIntelDataset() throws IOException {
-        List<CpuSpecification> objects = CsvMapper.mapToObjects(
-                ResourceReader.getIntelDataset(),
-                ResourceReader.getIntelColumns(),
-                CsvColumnIndexMapping.Intel(),
-                CsvColumnModification.Intel());
+        List<CpuSpecification> objects = CsvMapper.mapToObjects(new IntelDataset());
         assertNotNull(objects);
         assertFalse(objects.isEmpty(), "objects are empty");
     }
 
     @Test
     void mapBenchmarkDataset() throws IOException {
-        List<CpuSpecification> objects = CsvMapper.mapToObjects(
-                ResourceReader.getCpuBenchmarkDataset(),
-                ResourceReader.getCpuBenchmarkColumns(),
-                CsvColumnIndexMapping.CpuBenchmark(),
-                CsvColumnModification.CpuBenchmark());
+        List<CpuSpecification> objects = CsvMapper.mapToObjects(new BenchmarkDataset());
+        assertNotNull(objects);
+        assertFalse(objects.isEmpty(), "objects are empty");
+    }
+
+    @Test
+    void mapCpuworldDataset() throws IOException {
+        List<CpuSpecification> objects = CsvMapper.mapToObjects(new CpuworldDataset());
         assertNotNull(objects);
         assertFalse(objects.isEmpty(), "objects are empty");
     }

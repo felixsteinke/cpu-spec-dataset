@@ -4,10 +4,11 @@ Dataset for CPU specifications from Intel and AMD.
 
 ## Table of Content
 
-* [Raw Dataset](dataset)
+* [Raw Datasets](dataset)
 * [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
 * [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper)
 * [Benchmark Web Scraper](benchmark-web-scraper/src/main/java/cpu/spec/scraper)
+* [Cpuworld Web Scraper](cpuworld-web-scraper/src/main/java/cpu/spec/scraper)
 
 ## Installation
 
