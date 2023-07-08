@@ -111,5 +111,5 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd cpuworld-web-scraper
-mvn exec:java
+mvn -jar ./target/exectuable.jar
 ```
