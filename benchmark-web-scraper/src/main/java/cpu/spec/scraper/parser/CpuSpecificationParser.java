@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 
+import static cpu.spec.scraper.validator.JsoupValidator.validate;
+
 public abstract class CpuSpecificationParser {
     /**
      * @param url <a href="https://www.cpubenchmark.net/cpu.php?cpu=Intel+Xeon+Platinum+8173M+%40+2.00GHz&id=3182">Cpu Benchmark Specification Page</a>
@@ -20,11 +22,8 @@ public abstract class CpuSpecificationParser {
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
         Element nameElement = page.selectFirst("span.cpuname");
-        if (nameElement != null) {
-            specification.cpuName = nameElement.text();
-        } else {
-            throw new ElementNotFoundException("Specification Page", "span.cpuname");
-        }
+        validate(nameElement, "Page", "span.cpuname");
+        specification.cpuName = nameElement.text();
 
         Element socketElement = page.selectFirst("div.left-desc-cpu > p:contains(Socket)");
         if (socketElement != null) {
@@ -45,7 +44,7 @@ public abstract class CpuSpecificationParser {
         if (coresThreadsElement != null) {
             String[] values = coresThreadsElement.ownText().trim().split(" ");
             specification.cores = values[0];
-            if (values.length == 2){
+            if (values.length == 2) {
                 specification.threads = values[1];
             }
         }

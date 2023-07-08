@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cpu.spec.scraper.validator.JsoupValidator.validate;
+
 public abstract class CpuProductScraper {
     /**
      * @param url <a href="https://ark.intel.com/content/www/us/en/ark.html#@PanelLabel122139">Intel Processor Product Page</a>
@@ -21,9 +23,7 @@ public abstract class CpuProductScraper {
         Document page = Jsoup.connect(url).get();
 
         Elements generationButtons = page.select("div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
-        if (generationButtons.isEmpty()) {
-            throw new ElementNotFoundException("Product Page", "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
-        }
+        validate(generationButtons, "Page", "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
 
         List<String> seriesLinks = new ArrayList<>();
         for (Element generationBtn : generationButtons) {

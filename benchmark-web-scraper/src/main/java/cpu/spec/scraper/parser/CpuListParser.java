@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cpu.spec.scraper.validator.JsoupValidator.validate;
+
 public abstract class CpuListParser {
     /**
      * @param resourceFilePath path within the resource directory
@@ -24,14 +26,10 @@ public abstract class CpuListParser {
         Document page = Jsoup.parse(ResourceFileReader.getFile(resourceFilePath));
 
         Element tableBody = page.selectFirst("#cputable > tbody");
-        if (tableBody == null) {
-            throw new ElementNotFoundException("Cpu Table Page", "#cputable > tbody");
-        }
+        validate(tableBody, "Page", "#cputable > tbody");
 
         Elements tableRows = tableBody.select("tr");
-        if (tableRows.isEmpty()) {
-            throw new ElementNotFoundException("tbody", "tr");
-        }
+        validate(tableRows, "#cputable > tbody", "tr");
 
         List<String> specificationLinks = new ArrayList<>();
         for (Element row : tableRows) {

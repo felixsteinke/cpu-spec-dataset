@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static cpu.spec.scraper.validator.JsoupValidator.validate;
+
 public abstract class CpuSpecificationParser {
     /**
      * @param url <a href="https://ark.intel.com/content/www/us/en/ark/products/226449/intel-pentium-gold-processor-8500-8m-cache-up-to-4-40-ghz.html">Intel Processor Specification Page</a>
@@ -22,21 +24,20 @@ public abstract class CpuSpecificationParser {
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
         Element titleElement = page.selectFirst("div.product-family-title-text > h1");
-        if (titleElement == null) {
-            throw new ElementNotFoundException("Specification Page", "div.product-family-title-text > h1");
-        }
+        validate(titleElement, "Page", "div.product-family-title-text > h1");
+
         specification.id = selectId(url);
         specification.cpuName = titleElement.text();
         specification.sourceUrl = url;
 
         for (Element dataSpan : page.select("span.value[data-key]")) {
             String dataKey = dataSpan.attr("data-key");
-            if (isKeyIgnored(dataKey)){
+            if (isKeyIgnored(dataKey)) {
                 continue;
             }
             String dataValue = dataSpan.text().trim();
 
-            if (dataValue.isBlank()){
+            if (dataValue.isBlank()) {
                 specification.dataValues.put(dataKey, null);
                 continue;
             }
@@ -45,7 +46,7 @@ public abstract class CpuSpecificationParser {
         return specification;
     }
 
-    private static String selectId(String url){
+    private static String selectId(String url) {
         try {
             return new URI(url).getPath().trim().split("/")[7];
         } catch (URISyntaxException e) {
@@ -53,7 +54,7 @@ public abstract class CpuSpecificationParser {
         }
     }
 
-    private static boolean isKeyIgnored(String key){
+    private static boolean isKeyIgnored(String key) {
         return key.equalsIgnoreCase("DatasheetUrl");
     }
 }
