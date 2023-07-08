@@ -12,7 +12,16 @@ Dataset for CPU specifications from Intel and AMD.
 
 ## Installation
 
-Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__:
+Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__.
+
+__Windows__:
+
+```shell
+xcopy .\dataset\ .\dataset-api\src\main\resources\dataset /s /e /h /y 
+mvn clean install -DskipTests
+```
+
+__Linux__:
 
 ```shell
 copy ./dataset/* ./dataset-api/src/main/resources/dataset/
