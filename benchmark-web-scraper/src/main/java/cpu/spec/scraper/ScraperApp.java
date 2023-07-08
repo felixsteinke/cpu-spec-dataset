@@ -1,7 +1,5 @@
 package cpu.spec.scraper;
 
-import cpu.spec.scraper.exception.DirectoryNotFoundException;
-import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
 import cpu.spec.scraper.parser.CpuListParser;
@@ -9,7 +7,6 @@ import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
 import cpu.spec.scraper.utils.LogUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -18,14 +15,13 @@ import java.util.logging.Logger;
 public class ScraperApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
     private static final String HOST_URL = "https://www.cpubenchmark.net/";
-    private static final String ENTRY_URL = "cpu_mega_page.html";
 
-    public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
+    public static void main(String[] args) throws Exception {
         LOGGER.info("Starting Cpu Benchmark Scraper.");
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "benchmark-cpus.csv";
 
-        List<String> specificationLinks = CpuListParser.extractSpecificationLinks(ENTRY_URL);
+        List<String> specificationLinks = CpuListParser.extractSpecificationLinks();
         LOGGER.info("Extracted " + specificationLinks.size() + " CPU Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);

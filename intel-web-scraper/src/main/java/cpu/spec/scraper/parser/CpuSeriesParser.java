@@ -1,7 +1,7 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
-import org.jsoup.Jsoup;
+import cpu.spec.scraper.factory.JsoupFactory;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -20,7 +20,7 @@ public abstract class CpuSeriesParser {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static List<String> extractSpecificationLinks(String url) throws IOException, ElementNotFoundException {
-        Document page = Jsoup.connect(url).get();
+        Document page = JsoupFactory.getConnection(url).get();
 
         Element tableBody = page.selectFirst("tbody");
         validate(tableBody, "Page", "tbody");

@@ -1,7 +1,7 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
-import org.jsoup.Jsoup;
+import cpu.spec.scraper.factory.JsoupFactory;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -20,7 +20,7 @@ public abstract class CpuProductScraper {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static List<String> extractSeriesLinks(String url) throws IOException, ElementNotFoundException {
-        Document page = Jsoup.connect(url).get();
+        Document page = JsoupFactory.getConnection(url).get();
 
         Elements generationButtons = page.select("div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
         validate(generationButtons, "Page", "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");

@@ -2,7 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.exception.ElementNotFoundException;
-import org.jsoup.Jsoup;
+import cpu.spec.scraper.factory.JsoupFactory;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -20,7 +20,7 @@ public abstract class CpuSpecificationParser {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static CpuSpecificationModel extractSpecification(String url) throws IOException, ElementNotFoundException {
-        Document page = Jsoup.connect(url).get();
+        Document page = JsoupFactory.getConnection(url).get();
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
         Element titleElement = page.selectFirst("div.product-family-title-text > h1");
