@@ -2,6 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.ChromeDriverFactory;
+import cpu.spec.scraper.validator.SeleniumValidator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,8 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cpu.spec.scraper.validator.SeleniumValidator.validate;
-
 public abstract class CpuListParser {
     private static final String ENTRY_URL = "https://www.cpubenchmark.net/CPU_mega_page.html";
 
@@ -23,20 +22,20 @@ public abstract class CpuListParser {
      */
     public static List<String> extractSpecificationLinks() throws Exception {
         WebDriver driver = ChromeDriverFactory.getDriver();
+        SeleniumValidator validator = new SeleniumValidator(ENTRY_URL);
         List<String> specificationLinks = new ArrayList<>();
 
         try {
             driver.get(ENTRY_URL);
             Thread.sleep(250);
-            showAllEntries(driver);
+
+            WebElement selectElement = validator.findElement(driver, By.name("cputable_length"));
+            Select select = new Select(selectElement);
+            select.selectByVisibleText("All");
             Thread.sleep(250);
 
-            WebElement tableBody = driver.findElement(By.cssSelector("#cputable > tbody"));
-            validate(tableBody, "Page", "#cputable > tbody");
-
-            List<WebElement> tableRows = tableBody.findElements(By.cssSelector("tr"));
-            validate(tableRows, "#cputable > tbody", "tr");
-
+            WebElement tableBody = validator.findElement(driver, By.cssSelector("#cputable > tbody"));
+            List<WebElement> tableRows = validator.findElements(tableBody, By.cssSelector("tr"));
 
             for (WebElement row : tableRows) {
                 WebElement aSpec = row.findElement(By.tagName("a"));
@@ -52,12 +51,5 @@ public abstract class CpuListParser {
         }
         driver.quit();
         return specificationLinks;
-    }
-
-    private static void showAllEntries(WebDriver driver) throws ElementNotFoundException {
-        WebElement selectElement = driver.findElement(By.name("cputable_length"));
-        validate(selectElement, "Page", "cputable_length");
-        Select select = new Select(selectElement);
-        select.selectByVisibleText("All");
     }
 }

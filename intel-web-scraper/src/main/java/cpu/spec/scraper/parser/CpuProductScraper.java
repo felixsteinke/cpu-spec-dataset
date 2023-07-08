@@ -2,6 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -9,8 +10,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static cpu.spec.scraper.validator.JsoupValidator.validate;
 
 public abstract class CpuProductScraper {
     /**
@@ -21,9 +20,9 @@ public abstract class CpuProductScraper {
      */
     public static List<String> extractSeriesLinks(String url) throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(url).get();
+        JsoupValidator validator = new JsoupValidator(url);
 
-        Elements generationButtons = page.select("div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
-        validate(generationButtons, "Page", "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
+        Elements generationButtons = validator.select(page, "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
 
         List<String> seriesLinks = new ArrayList<>();
         for (Element generationBtn : generationButtons) {

@@ -2,6 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -9,8 +10,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static cpu.spec.scraper.validator.JsoupValidator.validate;
 
 public abstract class CpuSeriesParser {
     /**
@@ -21,12 +20,11 @@ public abstract class CpuSeriesParser {
      */
     public static List<String> extractSpecificationLinks(String url) throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(url).get();
+        JsoupValidator validator = new JsoupValidator(url);
 
-        Element tableBody = page.selectFirst("tbody");
-        validate(tableBody, "Page", "tbody");
+        Element tableBody = validator.selectFirst(page, "tbody");
 
-        Elements tableRows = tableBody.select("tr");
-        validate(tableRows, "tbody", "tr");
+        Elements tableRows = validator.select(tableBody, "tr");
 
         List<String> specificationLinks = new ArrayList<>();
         for (Element row : tableRows) {

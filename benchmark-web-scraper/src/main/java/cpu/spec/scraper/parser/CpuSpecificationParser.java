@@ -3,12 +3,11 @@ package cpu.spec.scraper.parser;
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-
-import static cpu.spec.scraper.validator.JsoupValidator.validate;
 
 public abstract class CpuSpecificationParser {
     /**
@@ -19,10 +18,10 @@ public abstract class CpuSpecificationParser {
      */
     public static CpuSpecificationModel extractSpecification(String url) throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(url).get();
+        JsoupValidator validator = new JsoupValidator(url);
         CpuSpecificationModel specification = new CpuSpecificationModel();
 
-        Element nameElement = page.selectFirst("span.cpuname");
-        validate(nameElement, "Page", "span.cpuname");
+        Element nameElement = validator.selectFirst(page, "span.cpuname");
         specification.cpuName = nameElement.text();
 
         Element socketElement = page.selectFirst("div.left-desc-cpu > p:contains(Socket)");
