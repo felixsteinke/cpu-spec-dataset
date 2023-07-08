@@ -2,8 +2,8 @@ package cpu.spec.dataset.api.configuration;
 
 import cpu.spec.dataset.api.CpuSpecification;
 import cpu.spec.dataset.api.CpuSpecificationRepo;
+import cpu.spec.dataset.api.dataset.*;
 import cpu.spec.dataset.api.mapping.CsvMapper;
-import cpu.spec.dataset.api.registry.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -50,7 +50,7 @@ public class StartupService {
                     cpuSpecRepo.saveAll(cpuSpecs);
                 } catch (Exception e) {
                     LOGGER.severe("Processing " + dataset.getName() + " encountered " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
             LOGGER.info("Finished dataset import.");

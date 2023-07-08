@@ -1,7 +1,7 @@
 package cpu.spec.dataset.api.mapping;
 
 import cpu.spec.dataset.api.CpuSpecification;
-import cpu.spec.dataset.api.registry.Dataset;
+import cpu.spec.dataset.api.dataset.Dataset;
 
 import java.io.IOException;
 import java.util.List;

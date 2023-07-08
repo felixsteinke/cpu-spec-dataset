@@ -1,4 +1,4 @@
-package cpu.spec.dataset.api.registry;
+package cpu.spec.dataset.api.dataset;
 
 import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;

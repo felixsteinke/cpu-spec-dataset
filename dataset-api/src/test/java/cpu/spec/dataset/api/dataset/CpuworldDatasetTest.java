@@ -1,4 +1,4 @@
-package cpu.spec.dataset.api.registry;
+package cpu.spec.dataset.api.dataset;
 
 class CpuworldDatasetTest extends DatasetTest {
     protected CpuworldDatasetTest() {

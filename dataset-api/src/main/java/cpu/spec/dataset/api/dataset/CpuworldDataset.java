@@ -1,4 +1,4 @@
-package cpu.spec.dataset.api.registry;
+package cpu.spec.dataset.api.dataset;
 
 import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;
@@ -7,10 +7,10 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BenchmarkDataset extends Dataset {
+public class CpuworldDataset extends Dataset {
 
-    public BenchmarkDataset() {
-        super("dataset/benchmark-cpus.csv");
+    public CpuworldDataset() {
+        super("dataset/cpuworld-cpus.csv");
     }
 
     /**
@@ -19,15 +19,15 @@ public class BenchmarkDataset extends Dataset {
     @Override
     public CsvColumnIndexMapping getColumnMapping() {
         CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
-        mapping.name = new int[]{0};
-        mapping.productCollection = new int[]{};
-        mapping.cores = new int[]{4};
-        mapping.threads = new int[]{5};
-        mapping.baseFrequency = new int[]{2};
-        mapping.maxFrequency = new int[]{3};
-        mapping.tdp = new int[]{6};
-        mapping.launchDate = new int[]{7};
-        mapping.sourceUrl = new int[]{8};
+        mapping.name = new int[]{1};
+        mapping.productCollection = new int[]{18};
+        mapping.cores = new int[]{25};
+        mapping.threads = new int[]{26};
+        mapping.baseFrequency = new int[]{9};
+        mapping.maxFrequency = new int[]{17};
+        mapping.tdp = new int[]{27};
+        mapping.launchDate = new int[]{};
+        mapping.sourceUrl = new int[]{29};
         return mapping;
     }
 
@@ -38,31 +38,25 @@ public class BenchmarkDataset extends Dataset {
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
         modification.name = (s -> s.replaceAll("\"", ""));
-
         Function<String, String> frequencyFunction = (s -> {
-            if (s.contains("GHz")) {
-                s = s.replaceAll("GHz", "").trim();
-                if (s.endsWith(".0")) {
-                    s = s.substring(0, s.length() - 2);
+            if (s.contains("MHz")) {
+                Matcher matcher = Pattern.compile("\\d+ MHz").matcher(s);
+                if (matcher.find()) {
+                    return matcher.group().replaceAll("MHz", "").trim();
                 }
-                int mhz = (int) Float.parseFloat(s) * 1000;
-                return Integer.toString(mhz);
-            } else if (s.contains("MHz")) {
-                return s.replaceAll("MHz", "").trim();
-            } else {
-                return s;
             }
+            if (s.contains("GHz")) {
+                Matcher matcher = Pattern.compile("\\d+.\\d+ GHz").matcher(s);
+                if (matcher.find()) {
+                    String ghz = matcher.group().replaceAll("GHz", "").trim();
+                    int mhz = (int) Float.parseFloat(s) * 1000;
+                    return Integer.toString(mhz);
+                }
+            }
+            return s;
         });
         modification.baseFrequency = frequencyFunction;
         modification.maxFrequency = frequencyFunction;
-        modification.launchDate = (s -> {
-            Matcher matcher = Pattern.compile("\\d{4}").matcher(s);
-            if (matcher.find()) {
-                return matcher.group();
-            } else {
-                return null;
-            }
-        });
         modification.tdp = (s -> {
             Matcher matcher = Pattern.compile("\\d+").matcher(s);
             if (matcher.find()) {

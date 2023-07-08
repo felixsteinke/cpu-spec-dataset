@@ -1,10 +1,10 @@
 package cpu.spec.dataset.api.mapping;
 
 import cpu.spec.dataset.api.CpuSpecification;
-import cpu.spec.dataset.api.registry.AmdDataset;
-import cpu.spec.dataset.api.registry.BenchmarkDataset;
-import cpu.spec.dataset.api.registry.CpuworldDataset;
-import cpu.spec.dataset.api.registry.IntelDataset;
+import cpu.spec.dataset.api.dataset.AmdDataset;
+import cpu.spec.dataset.api.dataset.BenchmarkDataset;
+import cpu.spec.dataset.api.dataset.CpuworldDataset;
+import cpu.spec.dataset.api.dataset.IntelDataset;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
