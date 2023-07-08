@@ -1,43 +1,40 @@
 package cpu.spec.scraper;
 
+import cpu.spec.scraper.exception.DirectoryNotFoundException;
 import cpu.spec.scraper.exception.ElementNotFoundException;
+import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
 import cpu.spec.scraper.parser.CpuProductScraper;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
+import cpu.spec.scraper.utils.FileUtils;
+import cpu.spec.scraper.utils.LogUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ScraperApp {
-    public static void main(String[] args) throws ElementNotFoundException, IOException {
-        String execDir = System.getProperty("user.dir");
-        String outputDir = "./dataset/";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
+    private static final String HOST_URL = "https://ark.intel.com";
+
+    public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
+        LOGGER.info("Starting Intel Scraper.");
+        String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "intel-cpus.csv";
 
-        if (!new File(outputDir).exists()) {
-            outputDir = "../dataset/";
-            if (!new File(outputDir).exists()) {
-                System.out.println("[WARNING] Execution directory: " + execDir);
-                throw new ElementNotFoundException("Target Directory", outputDir);
-            }
-        }
-
-        System.out.println("[INFO] Starting Intel Web Scraper.");
-
         List<String> seriesLinks = CpuProductScraper.extractSeriesLinks("https://ark.intel.com/content/www/us/en/ark.html#@Processors");
-        System.out.println("[INFO] Extracted " + seriesLinks.size() + " CPU Series Links.");
+        LOGGER.info("Extracted " + seriesLinks.size() + " CPU Series Links.");
 
         List<String> specificationLinks = extractSpecificationLinks(seriesLinks);
-        System.out.println("[INFO] Extracted " + specificationLinks.size() + " CPU Specification Links.");
+        LOGGER.info("Extracted " + specificationLinks.size() + " CPU Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
-        System.out.println("[INFO] Extracted " + specifications.size() + " CPU Specifications.");
+        LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
 
         CpuSpecificationWriter.writeCsvFile(specifications, outputDir + outputFile);
-        System.out.println("[INFO] Finished Intel Web Scraper. Output at: " + execDir + outputDir + outputFile);
+        LOGGER.info("Finished Intel Scraper. Output at: " + outputDir + outputFile);
     }
 
     private static List<String> extractSpecificationLinks(List<String> seriesLinks) {
@@ -47,7 +44,7 @@ public class ScraperApp {
             try {
                 specificationLinks.addAll(CpuSeriesParser.extractSpecificationLinks(fullLink));
             } catch (Exception e) {
-                System.out.println("[" + e.getClass().getSimpleName() + "]: " + e.getMessage() + " (" + fullLink + ")");
+                LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));
             }
         }
         return specificationLinks;
@@ -60,10 +57,10 @@ public class ScraperApp {
             try {
                 specifications.add(CpuSpecificationParser.extractSpecification(fullLink));
                 if (specifications.size() % 250 == 0) {
-                    System.out.println("[PROGRESS] Extracted " + specifications.size() + " CPU Specifications.");
+                    LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
                 }
             } catch (Exception e) {
-                System.out.println("[" + e.getClass().getSimpleName() + "]: " + e.getMessage() + " (" + fullLink + ")");
+                LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));
             }
         }
         return specifications;

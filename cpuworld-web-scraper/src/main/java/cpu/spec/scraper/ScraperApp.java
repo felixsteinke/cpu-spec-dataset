@@ -8,6 +8,7 @@ import cpu.spec.scraper.parser.CpuOverviewParser;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
+import cpu.spec.scraper.utils.LogUtils;
 import cpu.spec.scraper.utils.TimeUtils;
 
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class ScraperApp {
             try {
                 outputLinks.addAll(CpuSeriesParser.extractNavigationLinks(fullLink));
             } catch (Exception e) {
-                LOGGER.warning(buildExceptionMessage(e, fullLink));
+                LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));
             }
         }
         return outputLinks;
@@ -80,14 +81,10 @@ public class ScraperApp {
                     LOGGER.info("Extracted " + specifications.size() + " of " + specificationLinks.size() + " CPU Specifications.");
                 }
             } catch (Exception e) {
-                LOGGER.warning(buildExceptionMessage(e, link));
+                LOGGER.warning(LogUtils.exceptionMessage(e, link));
             }
         }
         TimeUtils.sleepBetween(10000, 3000);
         return specifications;
-    }
-
-    private static String buildExceptionMessage(Exception e, String causedUrl) {
-        return "[" + e.getClass().getSimpleName() + "]: " + e.getMessage() + " (" + causedUrl + ")";
     }
 }
