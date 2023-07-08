@@ -18,13 +18,14 @@ import java.util.logging.Logger;
 public class ScraperApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScraperApp.class);
     private static final String HOST_URL = "https://www.cpubenchmark.net/";
+    private static final String ENTRY_URL = "cpu_mega_page.html";
 
     public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
         LOGGER.info("Starting Cpu Benchmark Scraper.");
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "benchmark-cpus.csv";
 
-        List<String> specificationLinks = CpuListParser.extractSpecificationLinks("cpu_mega_page.html");
+        List<String> specificationLinks = CpuListParser.extractSpecificationLinks(ENTRY_URL);
         LOGGER.info("Extracted " + specificationLinks.size() + " CPU Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
@@ -44,7 +45,7 @@ public class ScraperApp {
         List<Future<CpuSpecificationModel>> futures = new ArrayList<>();
         // submit extractions
         for (String link : specificationLinks) {
-            String fullLink = "https://www.cpubenchmark.net/" + link;
+            String fullLink = HOST_URL + link;
             Callable<CpuSpecificationModel> task = () -> CpuSpecificationParser.extractSpecification(fullLink);
             Future<CpuSpecificationModel> future = executor.submit(task);
             futures.add(future);
