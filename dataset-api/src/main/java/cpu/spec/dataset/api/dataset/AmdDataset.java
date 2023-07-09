@@ -36,9 +36,17 @@ public class AmdDataset extends Dataset {
     @Override
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
-        modification.name = (s -> s.replaceAll("\"", ""));
-        modification.productCollection = (s -> s.replaceAll("\"", ""));
+        modification.name = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("\"", "");
+        });
+        modification.manufacturer = (s -> "amd");
+        modification.productCollection = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("\"", "");
+        });
         Function<String, String> frequencyFunction = (s -> {
+            if (s == null) return null;
             if (s.contains("GHz")) {
                 Matcher matcher = Pattern.compile("\\d+(\\.\\d+)?").matcher(s);
                 if (matcher.find()) {
@@ -57,6 +65,7 @@ public class AmdDataset extends Dataset {
         modification.baseFrequency = frequencyFunction;
         modification.maxFrequency = frequencyFunction;
         modification.tdp = (s -> {
+            if (s == null) return null;
             s = s.replaceAll("W", "").replaceAll("\\+", "");
             if (s.contains("-")) {
                 s = s.split("-")[1];
@@ -67,6 +76,7 @@ public class AmdDataset extends Dataset {
             return s;
         });
         modification.launchDate = (s -> {
+            if (s == null) return null;
             Matcher matcher = Pattern.compile("\\d{4}").matcher(s);
             if (matcher.find()) {
                 return matcher.group();

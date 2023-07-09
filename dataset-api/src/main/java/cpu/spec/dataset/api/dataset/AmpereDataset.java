@@ -32,11 +32,12 @@ public class AmpereDataset extends Dataset {
     @Override
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
-        modification.name = null;
+        modification.name = (s -> "Ampere Altra " + s);
         modification.productCollection = null;
         modification.cores = null;
         modification.threads = null;
         modification.baseFrequency = (s -> {
+            if (s == null) return null;
             int mhz = (int) Float.parseFloat(s) * 1000;
             return Integer.toString(mhz);
         });

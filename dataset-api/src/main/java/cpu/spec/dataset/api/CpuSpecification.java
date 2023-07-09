@@ -108,9 +108,6 @@ public class CpuSpecification {
     }
 
     private static String transformValue(String columnValue, Function<String, String> modification) {
-        if (columnValue == null) {
-            return null;
-        }
         if (modification == null) {
             return columnValue;
         } else {
@@ -157,6 +154,7 @@ public class CpuSpecification {
 
     public void updateValues(String[] row, CsvColumnModification modification) {
         name = transformValue(getColumnValue(row, nameIndex), modification.name);
+        manufacturer = transformValue(null, modification.manufacturer);
         productCollection = transformValue(getColumnValue(row, productCollectionIndex), modification.productCollection);
         cores = transformIntValue(getColumnValue(row, coresIndex), modification.cores);
         threads = transformIntValue(getColumnValue(row, threadsIndex), modification.threads);

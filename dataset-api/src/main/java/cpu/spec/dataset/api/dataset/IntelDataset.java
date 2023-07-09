@@ -36,9 +36,13 @@ public class IntelDataset extends Dataset {
     @Override
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
-        modification.name = (s -> s.replaceAll("\"", ""));
-
+        modification.name = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("\"", "");
+        });
+        modification.manufacturer = (s -> "intel");
         Function<String, String> frequencyFunction = (s -> {
+            if (s == null) return null;
             if (s.contains("GHz")) {
                 s = s.replaceAll("GHz", "").trim();
                 int mhz = (int) Float.parseFloat(s) * 1000;
@@ -51,8 +55,12 @@ public class IntelDataset extends Dataset {
         });
         modification.baseFrequency = frequencyFunction;
         modification.maxFrequency = frequencyFunction;
-        modification.tdp = (s -> s.replaceAll("W", "").trim());
+        modification.tdp = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("W", "").trim();
+        });
         modification.launchDate = (s -> {
+            if (s == null) return null;
             Matcher matcher = Pattern.compile("\\d{2}").matcher(s);
             if (matcher.find()) {
                 return "20" + matcher.group();
@@ -60,7 +68,10 @@ public class IntelDataset extends Dataset {
                 return null;
             }
         });
-        modification.sourceUrl = (s -> s.substring(1, s.length() - 1));
+        modification.sourceUrl = (s -> {
+            if (s == null) return null;
+            return s.substring(1, s.length() - 1);
+        });
         return modification;
     }
 }
