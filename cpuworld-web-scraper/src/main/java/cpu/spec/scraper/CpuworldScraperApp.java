@@ -33,7 +33,11 @@ public class CpuworldScraperApp {
 
 
     private static List<CpuSpecificationModel> extractSelectedCpuSpecifications() {
-        List<String> specificationLinks = List.of("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html");
+        List<String> specificationLinks = List.of(
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208370C.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208373C.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%206268CL.html");
         LOGGER.info("Given " + specificationLinks.size() + " Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
