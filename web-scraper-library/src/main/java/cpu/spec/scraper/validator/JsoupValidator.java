@@ -24,6 +24,12 @@ public class JsoupValidator {
         return elements;
     }
 
+    public Elements select(Element rootElement, String query, int minElements) throws ElementNotFoundException {
+        Elements elements = rootElement.select(query);
+        validate(elements, rootElement.tagName(), query, minElements);
+        return elements;
+    }
+
     public Element selectFirst(Element rootElement, String query) throws ElementNotFoundException {
         Element element = rootElement.selectFirst(query);
         validate(element, rootElement.tagName(), query);
@@ -44,6 +50,12 @@ public class JsoupValidator {
 
     private void validate(Elements elements, String rootElement, String query) throws ElementNotFoundException {
         if (elements == null || elements.isEmpty()) {
+            throw new ElementNotFoundException(rootElement, query, pageUrl);
+        }
+    }
+
+    private void validate(Elements elements, String rootElement, String query, int minElements) throws ElementNotFoundException {
+        if (elements == null || elements.isEmpty() || elements.size() < minElements) {
             throw new ElementNotFoundException(rootElement, query, pageUrl);
         }
     }

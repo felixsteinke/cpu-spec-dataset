@@ -20,14 +20,14 @@ public class CpuworldDataset extends Dataset {
     public CsvColumnIndexMapping getColumnMapping() {
         CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
         mapping.name = new int[]{1};
-        mapping.productCollection = new int[]{18};
-        mapping.cores = new int[]{25};
-        mapping.threads = new int[]{26};
-        mapping.baseFrequency = new int[]{9};
-        mapping.maxFrequency = new int[]{17};
-        mapping.tdp = new int[]{27};
+        mapping.productCollection = new int[]{216};
+        mapping.cores = new int[]{268};
+        mapping.threads = new int[]{269};
+        mapping.baseFrequency = new int[]{204};
+        mapping.maxFrequency = new int[]{215};
+        mapping.tdp = new int[]{270};
         mapping.launchDate = new int[]{};
-        mapping.sourceUrl = new int[]{29};
+        mapping.sourceUrl = new int[]{273};
         return mapping;
     }
 
@@ -49,7 +49,7 @@ public class CpuworldDataset extends Dataset {
                 Matcher matcher = Pattern.compile("\\d+.\\d+ GHz").matcher(s);
                 if (matcher.find()) {
                     String ghz = matcher.group().replaceAll("GHz", "").trim();
-                    int mhz = (int) Float.parseFloat(s) * 1000;
+                    int mhz = (int) Float.parseFloat(ghz) * 1000;
                     return Integer.toString(mhz);
                 }
             }

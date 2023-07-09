@@ -1,10 +1,8 @@
 package cpu.spec.scraper;
 
 import cpu.spec.scraper.exception.DirectoryNotFoundException;
-import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
-import cpu.spec.scraper.parser.CpuOverviewParser;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
@@ -25,15 +23,33 @@ public class CpuworldScraperApp {
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "cpuworld-cpus.csv";
 
-        List<CpuSpecificationModel> specifications = extractSelectedCpuSpecifications();
+        List<CpuSpecificationModel> specifications = extractXeonPlatinumAndXeonGoldSpecifications();
 
         CpuSpecificationWriter.writeCsvFile(specifications, outputDir + outputFile);
         LOGGER.info("Finished Cpu World Scraper. Output at: " + outputDir + outputFile);
     }
 
+    private static List<CpuSpecificationModel> extractXeonPlatinumAndXeonGoldSpecifications() {
+        List<String> familyLinks = List.of(
+                "https://www.cpu-world.com/CPUs/Xeon/TYPE-Xeon Platinum.html",
+                "https://www.cpu-world.com/CPUs/Xeon/TYPE-Xeon Gold.html");
+        LOGGER.info("Given " + familyLinks.size() + " Family Links.");
+
+        List<String> specificationHrefs = extractNavigationLinks(familyLinks);
+        List<String> specificationLinks = specificationHrefs.stream().map(href -> HOST_URL + href).toList();
+        LOGGER.info("Extracted " + specificationLinks.size() + " Specification Links.");
+
+        List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
+        LOGGER.info("Extracted " + specifications.size() + " of " + specificationLinks.size() + " CPU Specifications.");
+        return specifications;
+    }
 
     private static List<CpuSpecificationModel> extractSelectedCpuSpecifications() {
-        List<String> specificationLinks = List.of("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html");
+        List<String> specificationLinks = List.of(
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8272CL.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8370C.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8373C.html",
+                "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 6268CL.html");
         LOGGER.info("Given " + specificationLinks.size() + " Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
@@ -41,32 +57,13 @@ public class CpuworldScraperApp {
         return specifications;
     }
 
-    private static List<CpuSpecificationModel> extractAllCpuSpecifications() throws ElementNotFoundException, IOException {
-        List<String> overviewLinks = CpuOverviewParser.extractNavigationLinks();
-        LOGGER.info("Extracted " + overviewLinks.size() + " Overview Links.");
-
-        List<String> seriesLinks = extractNavigationLinks(overviewLinks);
-        LOGGER.info("Extracted " + seriesLinks.size() + " Series Links.");
-
-        List<String> familyLinks = extractNavigationLinks(seriesLinks);
-        LOGGER.info("Extracted " + familyLinks.size() + " Family Links.");
-
-        List<String> specificationLinks = extractNavigationLinks(familyLinks);
-        LOGGER.info("Extracted " + specificationLinks.size() + " Specification Links.");
-
-        List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks.stream().map(href -> HOST_URL + href).toList());
-        LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
-        return specifications;
-    }
-
     private static List<String> extractNavigationLinks(List<String> inputLinks) {
         List<String> outputLinks = new ArrayList<>();
         for (String link : inputLinks) {
-            String fullLink = HOST_URL + link;
             try {
-                outputLinks.addAll(CpuSeriesParser.extractNavigationLinks(fullLink));
+                outputLinks.addAll(CpuSeriesParser.extractNavigationLinks(link));
             } catch (Exception e) {
-                LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));
+                LOGGER.warning(LogUtils.exceptionMessage(e, link));
             }
         }
         return outputLinks;
@@ -76,15 +73,25 @@ public class CpuworldScraperApp {
         List<CpuSpecificationModel> specifications = new ArrayList<>();
         for (String link : specificationLinks) {
             try {
+                TimeUtils.sleepBetween(10000, 3000);
                 specifications.add(CpuSpecificationParser.extractSpecification(link));
                 if (specifications.size() % 250 == 0) {
                     LOGGER.info(LogUtils.progressMessage(specifications, specificationLinks, "CPU Specifications"));
                 }
+
             } catch (Exception e) {
                 LOGGER.warning(LogUtils.exceptionMessage(e, link));
+                LOGGER.info("Retrying extraction of: " + link);
+                try {
+                    specifications.add(CpuSpecificationParser.extractSpecification(link));
+                    if (specifications.size() % 250 == 0) {
+                        LOGGER.info(LogUtils.progressMessage(specifications, specificationLinks, "CPU Specifications"));
+                    }
+                } catch (Exception ex) {
+                    LOGGER.severe(LogUtils.exceptionMessage(e, link));
+                }
             }
         }
-        TimeUtils.sleepBetween(10000, 3000);
         return specifications;
     }
 }
