@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 public class CsvColumnModification {
     public Function<String, String> name;
+    public Function<String, String> manufacturer;
     public Function<String, String> productCollection;
     public Function<String, String> cores;
     public Function<String, String> threads;

@@ -37,9 +37,13 @@ public class BenchmarkDataset extends Dataset {
     @Override
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
-        modification.name = (s -> s.replaceAll("\"", ""));
+        modification.name = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("\"", "");
+        });
 
         Function<String, String> frequencyFunction = (s -> {
+            if (s == null) return null;
             if (s.contains("GHz")) {
                 s = s.replaceAll("GHz", "").trim();
                 if (s.endsWith(".0")) {
@@ -56,6 +60,7 @@ public class BenchmarkDataset extends Dataset {
         modification.baseFrequency = frequencyFunction;
         modification.maxFrequency = frequencyFunction;
         modification.launchDate = (s -> {
+            if (s == null) return null;
             Matcher matcher = Pattern.compile("\\d{4}").matcher(s);
             if (matcher.find()) {
                 return matcher.group();
@@ -64,6 +69,7 @@ public class BenchmarkDataset extends Dataset {
             }
         });
         modification.tdp = (s -> {
+            if (s == null) return null;
             Matcher matcher = Pattern.compile("\\d+").matcher(s);
             if (matcher.find()) {
                 return matcher.group();
@@ -71,7 +77,10 @@ public class BenchmarkDataset extends Dataset {
                 return null;
             }
         });
-        modification.sourceUrl = (s -> s.substring(1, s.length() - 1));
+        modification.sourceUrl = (s -> {
+            if (s == null) return null;
+            return s.substring(1, s.length() - 1);
+        });
         return modification;
     }
 }
