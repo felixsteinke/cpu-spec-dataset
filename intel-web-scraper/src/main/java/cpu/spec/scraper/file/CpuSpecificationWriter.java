@@ -4,6 +4,7 @@ import cpu.spec.scraper.CpuSpecificationModel;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public abstract class CpuSpecificationWriter {
@@ -13,7 +14,7 @@ public abstract class CpuSpecificationWriter {
      * @throws IOException if target filePath is invalid
      */
     public static void writeCsvFile(List<CpuSpecificationModel> cpuSpecifications, String filePath) throws IOException {
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (FileWriter writer = new FileWriter(filePath, StandardCharsets.UTF_8)) {
             List<String> keySequence = getKeySequence(cpuSpecifications);
 
             writer.append(String.format("%s,\"%s\",%s,\"%s\"\n",
