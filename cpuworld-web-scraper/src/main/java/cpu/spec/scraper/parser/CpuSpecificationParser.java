@@ -95,6 +95,9 @@ public abstract class CpuSpecificationParser {
                 || normedKey.contains("extensions")
                 || normedKey.contains("package")
                 || normedKey.contains("none")
-                || normedKey.contains("unknown");
+                || normedKey.contains("unknown")
+                || key.startsWith("BX")
+                || key.startsWith("CD")
+                || key.startsWith("PK");
     }
 }
