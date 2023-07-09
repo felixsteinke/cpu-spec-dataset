@@ -26,7 +26,7 @@ public class IntelDataset extends Dataset {
         mapping.maxFrequency = new int[]{27, 19};
         mapping.tdp = new int[]{139, 29, 31, 194};
         mapping.launchDate = new int[]{17, 68};
-        mapping.sourceUrl = new int[]{245};
+        mapping.sourceUrl = new int[]{246};
         return mapping;
     }
 
