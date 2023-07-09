@@ -80,17 +80,6 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 All updates to the dataset need to carefully reviewed. The column mappings and modifications need to be adjusted in the
 corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dataset) for the __Dataset API__.
 
-### [Intel Dataset](dataset/intel-cpus.csv)
-
-Extracted from
-[https://ark.intel.com/content/www/us/en/ark.html](https://ark.intel.com/content/www/us/en/ark.html#@Processors)
-with the responsible __Web Scraper__.
-
-```shell
-cd intel-web-scraper
-java -jar ./target/exectuable.jar
-```
-
 ### [AMD Dataset](dataset/amd-cpus.csv)
 
 Manually __Export Data__ as __CSV/Excel__
@@ -102,6 +91,28 @@ from [https://www.amd.com/en/products/specifications/processors](https://www.amd
 ![amd-csv-export](.docs/amd-csv-export.png)
 
 </details>
+
+### [Ampere Dataset](dataset/ampere-cpus.csv)
+
+Extracted from
+[https://amperecomputing.com/briefs/ampere-altra-family-product-brief](https://amperecomputing.com/briefs/ampere-altra-family-product-brief)
+with the responsible __Web Scraper__.
+
+```shell
+cd ampere-web-scraper
+java -jar ./target/exectuable.jar
+```
+
+### [Intel Dataset](dataset/intel-cpus.csv)
+
+Extracted from
+[https://ark.intel.com/content/www/us/en/ark.html](https://ark.intel.com/content/www/us/en/ark.html#@Processors)
+with the responsible __Web Scraper__.
+
+```shell
+cd intel-web-scraper
+java -jar ./target/exectuable.jar
+```
 
 ### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
 

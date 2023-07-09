@@ -25,6 +25,7 @@
         <module>intel-web-scraper</module>
         <module>benchmark-web-scraper</module>
         <module>cpuworld-web-scraper</module>
+        <module>ampere-web-scraper</module>
         <module>web-scraper-library</module>
     </modules>
 

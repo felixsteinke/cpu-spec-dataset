@@ -1,0 +1,13 @@
+CpuName,ClockSpeed,Cores,TDP,SourceUrl
+M128-30,3.0,128,183,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+M128-28,2.8,128,154,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+M128-26,2.6,128,133,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+M96-30,3.0,96,157,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+M96-28,2.8,96,132,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q80-30,3.0,80,161,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q80-28,2.8,80,124,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q80-26,2.6,80,113,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q64-30,3.0,64,124,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q64-26,2.6,64,87,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q64-22,2.2,64,69,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+Q32-17,1.7,32,40,https://amperecomputing.com/briefs/ampere-altra-family-product-brief

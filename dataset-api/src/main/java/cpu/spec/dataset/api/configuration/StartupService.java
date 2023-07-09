@@ -34,7 +34,8 @@ public class StartupService {
                     new AmdDataset(),
                     new BenchmarkDataset(),
                     new CpuworldDataset(),
-                    new IntelDataset());
+                    new IntelDataset(),
+                    new AmpereDataset());
             for (Dataset dataset : datasets) {
                 try {
                     List<CpuSpecification> cpuSpecs = CsvMapper.mapToObjects(dataset)
