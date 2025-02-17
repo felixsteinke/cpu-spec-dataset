@@ -83,7 +83,7 @@ corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dat
 ### [AMD Dataset](dataset/amd-cpus.csv)
 
 Manually __Export Data__ as __CSV/Excel__
-from [https://www.amd.com/en/products/specifications/processors](https://www.amd.com/en/products/specifications/processors)
+from [https://www.amd.com/en/products/specifications/processors.html](https://www.amd.com/en/products/specifications/processors.html)
 
 <details>
   <summary>Website Screenshot</summary>
