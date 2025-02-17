@@ -100,7 +100,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd ampere-web-scraper
-java -jar ./target/exectuable.jar
+java -jar ./target/executable.jar
 ```
 
 ### [Intel Dataset](dataset/intel-cpus.csv)
@@ -111,7 +111,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd intel-web-scraper
-java -jar ./target/exectuable.jar
+java -jar ./target/executable.jar
 ```
 
 ### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
@@ -121,7 +121,7 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd benchmark-web-scraper
-java -jar ./target/exectuable.jar
+java -jar ./target/executable.jar
 ```
 
 ### [CPU World Dataset](dataset/cpuworld-cpus.csv)
@@ -131,5 +131,5 @@ with the responsible __Web Scraper__.
 
 ```shell
 cd cpuworld-web-scraper
-mvn -jar ./target/exectuable.jar
+java -jar ./target/executable.jar
 ```
