@@ -1,18 +1,20 @@
 package cpu.spec.scraper.parser;
 
-import cpu.spec.scraper.exception.ElementNotFoundException;
-import cpu.spec.scraper.factory.JsoupFactory;
-import cpu.spec.scraper.validator.JsoupValidator;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import cpu.spec.scraper.exception.ElementNotFoundException;
+import cpu.spec.scraper.factory.JsoupFactory;
+import cpu.spec.scraper.validator.JsoupValidator;
+
+
 public abstract class CpuProductParser {
-    private static final String ENTRY_URL = "https://ark.intel.com/content/www/us/en/ark.html#@Processors";
+    private static final String ENTRY_URL = "https://www.intel.com/content/www/us/en/ark.html";
 
     /**
      * @return series links for sub routing
