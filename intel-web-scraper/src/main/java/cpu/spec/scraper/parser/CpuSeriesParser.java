@@ -1,15 +1,15 @@
 package cpu.spec.scraper.parser;
 
-import cpu.spec.scraper.exception.ElementNotFoundException;
-import cpu.spec.scraper.factory.JsoupFactory;
-import cpu.spec.scraper.validator.JsoupValidator;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import cpu.spec.scraper.exception.ElementNotFoundException;
+import cpu.spec.scraper.factory.JsoupFactory;
 
 public abstract class CpuSeriesParser {
     /**
@@ -20,23 +20,21 @@ public abstract class CpuSeriesParser {
      */
     public static List<String> extractSpecificationLinks(String url) throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(url).get();
-        JsoupValidator validator = new JsoupValidator(url);
 
-        Element tableBody = validator.selectFirst(page, "tbody");
-
-        Elements tableRows = validator.select(tableBody, "tr");
+        // xPath: table with id "product-table" -> table body -> table rows
+        String xPathQuery = ".//table[@id='product-table']//tbody/tr";
+        Elements tableRows = page.selectXpath(xPathQuery);
 
         List<String> specificationLinks = new ArrayList<>();
         for (Element row : tableRows) {
-            Element firstColumn = row.selectFirst("td");
-            if (firstColumn == null) {
-                continue;
+
+            // xpath: table data with data-component "arkproductlink" -> "a" elements
+            xPathQuery = ".//td[@data-component='arkproductlink']//a";
+            
+            Element linkElement = row.selectXpath(xPathQuery).first();
+            if (linkElement != null) {
+                specificationLinks.add(linkElement.attr("href"));
             }
-            Element aSpec = row.selectFirst("a");
-            if (aSpec == null) {
-                continue;
-            }
-            specificationLinks.add(aSpec.attr("href"));
         }
         return specificationLinks;
     }
