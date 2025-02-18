@@ -10,7 +10,6 @@ import org.jsoup.select.Elements;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.JsoupFactory;
-import cpu.spec.scraper.validator.JsoupValidator;
 
 
 public abstract class CpuProductParser {
@@ -23,17 +22,24 @@ public abstract class CpuProductParser {
      */
     public static List<String> extractSeriesLinks() throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(ENTRY_URL).get();
-        JsoupValidator validator = new JsoupValidator(ENTRY_URL);
-
-        Elements generationButtons = validator.select(page, "div[data-parent-panel-key='Processors'] > div > div[data-panel-key]");
+        
+        // xPath: divs with data-parent-panel-key='Processors' -> divs with data-panel-key
+        String xPathQuery = ".//div[@data-parent-panel-key='Processors']//div[@data-panel-key]";
+        Elements generationButtons = page.selectXpath(xPathQuery);
 
         List<String> seriesLinks = new ArrayList<>();
         for (Element generationBtn : generationButtons) {
-            String generationLabel = generationBtn.attr("data-panel-key");
+
+            // Extract page specific IDs from selector Parents
+            String generationLabel = generationBtn.attr("data-panel-key"); //"abs:href");
             if (generationLabel.isBlank()) {
                 continue;
             }
-            Elements linkElements = page.select(String.format("div[data-parent-panel-key='%s'] > div > div > span > a[href]", generationLabel));
+            
+            // Extract links to Series
+            // xPath: "a" childred of divs with generation label
+            xPathQuery = String.format(".//div[@data-parent-panel-key='%s']//a", generationLabel);
+            Elements linkElements = page.selectXpath(xPathQuery);
             for (Element aSeries : linkElements) {
                 String seriesLink = aSeries.attr("href");
                 if (seriesLink.isBlank()) {
@@ -42,6 +48,6 @@ public abstract class CpuProductParser {
                 seriesLinks.add(seriesLink);
             }
         }
-        return seriesLinks;
+        return seriesLinks;            
     }
 }
