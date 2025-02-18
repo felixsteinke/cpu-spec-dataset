@@ -1,15 +1,16 @@
 package cpu.spec.scraper.parser;
 
-import cpu.spec.scraper.CpuSpecificationModel;
-import cpu.spec.scraper.exception.ElementNotFoundException;
-import cpu.spec.scraper.factory.JsoupFactory;
-import cpu.spec.scraper.validator.JsoupValidator;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import cpu.spec.scraper.CpuSpecificationModel;
+import cpu.spec.scraper.exception.ElementNotFoundException;
+import cpu.spec.scraper.factory.JsoupFactory;
 
 public abstract class CpuSpecificationParser {
     /**
@@ -20,27 +21,30 @@ public abstract class CpuSpecificationParser {
      */
     public static CpuSpecificationModel extractSpecification(String url) throws IOException, ElementNotFoundException {
         Document page = JsoupFactory.getConnection(url).get();
-        JsoupValidator validator = new JsoupValidator(url);
         CpuSpecificationModel specification = new CpuSpecificationModel();
-
-        Element titleElement = validator.selectFirst(page, "div.product-family-title-text > h1");
+        
+        // Select title element
+        // xPath: divs with class='product-details' -> flexible element with itemprop=name
+        String xPathQuery = ".//div[@class='product-details']//*[@itemprop='name']"; 
+        Element titleElement = page.selectXpath(xPathQuery).first();
 
         specification.id = selectId(url);
         specification.cpuName = titleElement.text();
         specification.sourceUrl = url;
+        
+        // Extract specifications
+        // xPath: divs with class "products processors" -> "a" elements with hrefs containing "processor" -> hrefs
+        xPathQuery = ".//div[contains(@id, 'spec')]//div[contains(@class, 'tech-section')]";
+        Elements specElements = page.selectXpath(xPathQuery);
+        for (Element specElement : specElements) {
+            xPathQuery = ".//div[contains(@class, 'tech-label')]";
+            Element dataKeyElement = specElement.selectXpath(xPathQuery).first();
+            xPathQuery = ".//div[contains(@class, 'tech-data')]";
+            Element dataValue = specElement.selectXpath(xPathQuery).first();
 
-        for (Element dataSpan : page.select("span.value[data-key]")) {
-            String dataKey = dataSpan.attr("data-key");
-            if (isKeyIgnored(dataKey)) {
-                continue;
+            if (dataKeyElement != null && dataValue != null && !isKeyIgnored(dataKeyElement.text())) {
+                specification.dataValues.put(dataKeyElement.text().trim(), dataValue.text().trim());
             }
-            String dataValue = dataSpan.text().trim();
-
-            if (dataValue.isBlank()) {
-                specification.dataValues.put(dataKey, null);
-                continue;
-            }
-            specification.dataValues.put(dataKey, dataValue);
         }
         return specification;
     }

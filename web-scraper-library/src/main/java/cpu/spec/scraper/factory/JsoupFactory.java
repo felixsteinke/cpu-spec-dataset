@@ -10,13 +10,16 @@ public abstract class JsoupFactory {
 
     private static String referrerUrl = "https://www.google.com/";
 
+    // Needs to be updated at times in order for Intel to accept the connection (see https://www.useragentstring.com/)
+    private static String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:135.0) Gecko/20100101 Firefox/135.0";
+
     /**
      * @param url for the connection
      * @return connection with custom configuration
      */
     public static Connection getConnection(String url) {
         Connection connection = Jsoup.connect(url);
-        connection.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+        connection.userAgent(userAgent);
         connection.referrer(referrerUrl);
         return connection;
     }

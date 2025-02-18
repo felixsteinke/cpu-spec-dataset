@@ -1,5 +1,12 @@
 package cpu.spec.scraper;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import me.tongfei.progressbar.ProgressBar;
+
 import cpu.spec.scraper.exception.DirectoryNotFoundException;
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.LoggerFactory;
@@ -10,14 +17,9 @@ import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
 import cpu.spec.scraper.utils.LogUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 public class IntelScraperApp {
     private static final Logger LOGGER = LoggerFactory.getLogger();
-    private static final String HOST_URL = "https://ark.intel.com";
+    private static final String HOST_URL = "https://intel.com";
 
     public static void main(String[] args) throws ElementNotFoundException, IOException, DirectoryNotFoundException {
         LOGGER.info("Starting Intel Scraper.");
@@ -51,6 +53,7 @@ public class IntelScraperApp {
     }
 
     private static List<CpuSpecificationModel> extractSpecifications(List<String> specificationLinks) {
+        ProgressBar progressBar = new ProgressBar("Extracting specifications:", specificationLinks.size());
         List<CpuSpecificationModel> specifications = new ArrayList<>();
         for (String link : specificationLinks) {
             String fullLink = HOST_URL + link;
@@ -62,7 +65,9 @@ public class IntelScraperApp {
             } catch (Exception e) {
                 LOGGER.warning(LogUtils.exceptionMessage(e, fullLink));
             }
+            progressBar.step();
         }
+        progressBar.close();
         return specifications;
     }
 }
