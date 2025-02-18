@@ -9,6 +9,8 @@ import org.jsoup.Jsoup;
 public abstract class JsoupFactory {
 
     private static String referrerUrl = "https://www.google.com/";
+
+    // Needs to be updated at times in order for Intel to accept the connection (see https://www.useragentstring.com/)
     private static String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:135.0) Gecko/20100101 Firefox/135.0";
 
     /**
