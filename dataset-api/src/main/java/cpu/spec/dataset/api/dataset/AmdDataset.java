@@ -1,7 +1,7 @@
 package cpu.spec.dataset.api.dataset;
 
-import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;
+import cpu.spec.dataset.api.mapping.CsvColumnNameMapping;
 
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -13,20 +13,20 @@ public class AmdDataset extends Dataset {
     }
 
     /**
-     * @return column mapping with fallbacks for cpu data (readonly)
+     * @return column mapping by header names with fallbacks for cpu data (readonly)
      */
     @Override
-    public CsvColumnIndexMapping getColumnMapping() {
-        CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
-        mapping.name = new int[]{2};
-        mapping.productCollection = new int[]{4};
-        mapping.cores = new int[]{10};
-        mapping.threads = new int[]{11};
-        mapping.baseFrequency = new int[]{13};
-        mapping.maxFrequency = new int[]{14};
-        mapping.tdp = new int[]{28, 29};
-        mapping.launchDate = new int[]{9};
-        mapping.sourceUrl = new int[]{};
+    public CsvColumnNameMapping getColumnNameMapping() {
+        CsvColumnNameMapping mapping = new CsvColumnNameMapping();
+        mapping.name = new String[]{"Name"};
+        mapping.productCollection = new String[]{"Series", "Family"};
+        mapping.cores = new String[]{"# of CPU Cores"};
+        mapping.threads = new String[]{"# of Threads"};
+        mapping.baseFrequency = new String[]{"Base Clock"};
+        mapping.maxFrequency = new String[]{"Max. Boost Clock"};
+        mapping.tdp = new String[]{"Default TDP", "AMD Configurable TDP (cTDP)"};
+        mapping.launchDate = new String[]{"Launch Date"};
+        mapping.sourceUrl = new String[]{};
         return mapping;
     }
 

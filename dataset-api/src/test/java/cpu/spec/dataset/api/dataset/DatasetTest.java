@@ -21,9 +21,17 @@ abstract class DatasetTest {
     }
 
     @Test
-    void getColumnMapping() {
+    void getColumnMapping() throws IOException {
         var mapping = dataset.getColumnMapping();
         assertNotNull(mapping);
+        assertTrue(mapping.name.length > 0, "name column is mapped");
+    }
+
+    @Test
+    void allMappedColumnNamesExistInDataset() throws IOException {
+        // fails if a regenerated dataset renamed or dropped a mapped column
+        var unresolved = dataset.getUnresolvedColumnNames();
+        assertTrue(unresolved.isEmpty(), dataset.getName() + " is missing mapped columns: " + unresolved);
     }
 
     @Test
@@ -44,5 +52,16 @@ abstract class DatasetTest {
         var columns = dataset.getDatasetColumns();
         assertNotNull(columns);
         assertFalse(columns.isEmpty(), "columns is empty");
+        columns.values().forEach(header -> {
+            assertFalse(header.startsWith("﻿"), "header contains BOM");
+            assertFalse(header.startsWith("\""), "header is quoted: " + header);
+        });
+    }
+
+    @Test
+    void normalizeHeader() {
+        assertEquals("intelturboboosttechnology20frequency",
+                Dataset.normalizeHeader("Intel® Turbo Boost Technology 2.0 Frequency‡"));
+        assertEquals("ofcpucores", Dataset.normalizeHeader("\"# of CPU Cores\""));
     }
 }

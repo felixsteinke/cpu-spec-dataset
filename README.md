@@ -77,8 +77,14 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 
 ## Dataset Update
 
-All updates to the dataset need to carefully reviewed. The column mappings and modifications need to be adjusted in the
+All updates to the dataset need to carefully reviewed. The columns are mapped by their __header name__ in the
 corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dataset) for the __Dataset API__.
+If a regenerated dataset renames or drops a mapped column, the dataset tests fail:
+
+```shell
+cd dataset-api
+mvn test -Dtest="CsvMapperTest,*DatasetTest"
+```
 
 ### [AMD Dataset](dataset/amd-cpus.csv)
 
