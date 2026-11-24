@@ -12,7 +12,7 @@ Dataset for CPU specifications from Intel and AMD.
 
 ## Installation
 
-Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__.
+Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__ and builds on __OpenJDK 21__ / __25__.
 
 __Windows__:
 
@@ -112,7 +112,7 @@ java -jar ./target/executable.jar
 ### [Intel Dataset](dataset/intel-cpus.csv)
 
 Extracted from
-[https://ark.intel.com/content/www/us/en/ark.html](https://ark.intel.com/content/www/us/en/ark.html#@Processors)
+[https://www.intel.com/content/www/us/en/ark.html](https://www.intel.com/content/www/us/en/ark.html)
 with the responsible __Web Scraper__.
 
 ```shell
