@@ -50,14 +50,14 @@ public class AmdDataset extends Dataset {
             if (s.contains("GHz")) {
                 Matcher matcher = Pattern.compile("\\d+(\\.\\d+)?").matcher(s);
                 if (matcher.find()) {
-                    int mhz = (int) Float.parseFloat(matcher.group()) * 1000;
+                    int mhz = Math.round(Float.parseFloat(matcher.group()) * 1000);
                     return Integer.toString(mhz);
                 } else {
                     return null;
                 }
 
             } else if (s.contains("MHz")) {
-                return s.replaceAll("MHz", "");
+                return s.replaceAll("MHz", "").trim();
             } else {
                 return s;
             }
@@ -84,7 +84,7 @@ public class AmdDataset extends Dataset {
                 return null;
             }
         });
-        modification.sourceUrl = (s -> "https://www.amd.com/en/products/specifications/processors");
+        modification.sourceUrl = (s -> "https://www.amd.com/en/products/specifications/processors.html");
         return modification;
     }
 }

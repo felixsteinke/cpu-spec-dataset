@@ -53,7 +53,7 @@ public class CpuworldDataset extends Dataset {
                 Matcher matcher = Pattern.compile("\\d+.\\d+ GHz").matcher(s);
                 if (matcher.find()) {
                     String ghz = matcher.group().replaceAll("GHz", "").trim();
-                    int mhz = (int) Float.parseFloat(ghz) * 1000;
+                    int mhz = Math.round(Float.parseFloat(ghz) * 1000);
                     return Integer.toString(mhz);
                 }
             }
@@ -72,7 +72,7 @@ public class CpuworldDataset extends Dataset {
         });
         modification.sourceUrl = (s -> {
             if (s == null) return null;
-            return s.substring(1, s.length() - 1);
+            return s.replaceAll("\"", "");
         });
         return modification;
     }

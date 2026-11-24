@@ -53,11 +53,15 @@ public class IntelDataset extends Dataset {
             return s.replaceAll("\"", "");
         });
         modification.manufacturer = (s -> "intel");
+        modification.productCollection = (s -> {
+            if (s == null) return null;
+            return s.replaceAll("\"", "");
+        });
         Function<String, String> frequencyFunction = (s -> {
             if (s == null) return null;
             if (s.contains("GHz")) {
                 s = s.replaceAll("GHz", "").trim();
-                int mhz = (int) Float.parseFloat(s) * 1000;
+                int mhz = Math.round(Float.parseFloat(s) * 1000);
                 return Integer.toString(mhz);
             } else if (s.contains("MHz")) {
                 return s.replaceAll("MHz", "").trim();
@@ -73,16 +77,19 @@ public class IntelDataset extends Dataset {
         });
         modification.launchDate = (s -> {
             if (s == null) return null;
+            // example: Q1'25 or Q4'99
             Matcher matcher = Pattern.compile("\\d{2}").matcher(s);
             if (matcher.find()) {
-                return "20" + matcher.group();
+                int year = Integer.parseInt(matcher.group());
+                int currentYear = Year.now().getValue() % 100;
+                return Integer.toString(year <= currentYear ? 2000 + year : 1900 + year);
             } else {
                 return null;
             }
         });
         modification.sourceUrl = (s -> {
             if (s == null) return null;
-            return s.substring(1, s.length() - 1);
+            return s.replaceAll("\"", "");
         });
         return modification;
     }
