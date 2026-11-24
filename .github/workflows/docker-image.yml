@@ -1,8 +1,14 @@
 name: Docker-Image
 
+# Release:  publishing a GitHub Release (e.g. tag "v2.1") builds the image and pushes the tags
+#           "<release tag>" and "latest" (pre-releases only get "<release tag>").
+#           The workflow fails without building if the release tag does not match "v" + the version of
+#           all pom.xml files, or if the image "<release tag>" already exists (no overwrites).
+# Manual:   "Run workflow" builds the image without pushing it (Dockerfile check).
 on:
+  release:
+    types: [ published ]
   workflow_dispatch:
-  # enables manual trigger
 
 jobs:
   build-and-push:
@@ -14,13 +20,75 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
-      - name: Build the Docker image
-        run: docker build --tag ghcr.io/${{ github.repository }}-api:latest .
+      - name: Stop if Release Tag does not match POM Version
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: python
+        run: |
+          import glob, os, sys
+          import xml.etree.ElementTree as ET
+
+          ns = {"m": "http://maven.apache.org/POM/4.0.0"}
+          tag = os.environ["RELEASE_TAG"]
+          mismatch = False
+          for pom in sorted(glob.glob("pom.xml") + glob.glob("*/pom.xml")):
+              project = ET.parse(pom).getroot()
+              # modules inheriting from the root pom take the version of their cpu.spec parent
+              version = project.findtext("m:version", namespaces=ns)
+              if version is None and project.findtext("m:parent/m:groupId", namespaces=ns) == "cpu.spec":
+                  version = project.findtext("m:parent/m:version", namespaces=ns)
+              if f"v{version}" == tag:
+                  print(f"{pom}: version {version} matches release tag {tag}")
+              else:
+                  print(f"::error file={pom}::Release tag {tag} does not match version {version} in {pom} (expected tag v{version}).")
+                  mismatch = True
+          sys.exit(1 if mismatch else 0)
 
       - name: Log in to Package Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        if: github.event_name == 'release'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push the Docker Image
-        run: docker push ghcr.io/${{ github.repository }}-api:latest
+      - name: Stop if Image Version already exists
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}-api:${RELEASE_TAG}"
+          if output=$(docker buildx imagetools inspect "$IMAGE" 2>&1); then
+            echo "::error::Image $IMAGE already exists. Published versions are not overwritten - use a new release tag."
+            exit 1
+          elif grep -qi "not found" <<< "$output"; then
+            echo "Image $IMAGE does not exist yet."
+          else
+            echo "::error::Could not check whether $IMAGE exists: $output"
+            exit 1
+          fi
+
+      - name: Docker Metadata (tags & labels)
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}-api
+          flavor: latest=false
+          tags: |
+            type=raw,value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease }}
+            type=sha,enable=${{ github.event_name != 'release' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and Push the Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

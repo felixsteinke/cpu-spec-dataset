@@ -12,7 +12,7 @@ Dataset for CPU specifications from Intel and AMD.
 
 ## Installation
 
-Tested on __OpenJDK 17.0.2__ & __Maven 3.6.3__ and builds on __OpenJDK 21__ / __25__.
+Requires __JDK 25__ & __Maven 3.6.3+__ (tested with OpenJDK 25 & Maven 3.6.3).
 
 __Windows__:
 
@@ -24,7 +24,7 @@ mvn clean install -DskipTests
 __Linux__:
 
 ```shell
-copy ./dataset/* ./dataset-api/src/main/resources/dataset/
+mkdir -p ./dataset-api/src/main/resources/dataset/ && cp ./dataset/* ./dataset-api/src/main/resources/dataset/
 mvn clean install -DskipTests
 ```
 
@@ -58,13 +58,18 @@ Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=cpu_db -p 3306:3306 -d mysql:8
 ```
 
+Published images: [ghcr.io/felixsteinke/cpu-spec-dataset-api](https://github.com/users/felixsteinke/packages/container/package/cpu-spec-dataset-api)
+with one tag per release (e.g. `v2.1`) and `latest` for the newest release.
+
 ```shell
-docker build -t ghcr.io/felixsteinke/cpu-spec-dataset-api:latest .
 docker run -p 8080:80 --name dataset-api ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 ```
 
+Local build:
+
 ```shell
-docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
+docker build -t cpu-spec-dataset-api:local .
+docker run -p 8080:80 --name dataset-api cpu-spec-dataset-api:local
 ```
 
 ### Container Configuration
@@ -74,6 +79,23 @@ docker push ghcr.io/felixsteinke/cpu-spec-dataset-api:latest
 | `SPRING_DATASOURCE_URL`      | `jdbc:mysql://host.docker.internal:3306/cpu_db` | Full url to a MySQL database |
 | `SPRING_DATASOURCE_USERNAME` | `root`                                          | Username and usually root    |
 | `SPRING_DATASOURCE_PASSWORD` | `password`                                      | Custom password              |
+
+> __Upgrading an existing database:__ the `prod` profile only validates the schema (`ddl-auto=validate`) and fails to
+> start with `missing column [...]` if the table was created by an older version (e.g. `v1.0` lacks the `*_index`
+> columns). Start the new version once with `SPRING_JPA_HIBERNATE_DDL_AUTO=update` to add the missing columns, then
+> use the default configuration again. Existing rows are kept and updated by the dataset import.
+
+## Release
+
+Versions follow `vMAJOR.MINOR` (e.g. `v2.1`): __MAJOR__ for recreated datasets or breaking API changes, __MINOR__ for
+updates and fixes. The Maven project version (all `pom.xml` files) matches the release version.
+
+1. Update the version in all `pom.xml` files (e.g. `2.1`) and merge to `main`.
+2. Publish a [GitHub Release](https://github.com/felixsteinke/cpu-spec-dataset/releases/new) with the tag `v2.1`.
+3. The [Docker-Image workflow](.github/workflows/docker-image.yml) builds the image and pushes the tags `v2.1`
+   and `latest` (pre-releases only get their version tag). The workflow fails before building if the release tag
+   does not match `v` + the version of all `pom.xml` files, or if the image `v2.1` already exists (published versions
+   are never overwritten).
 
 ## Dataset Update
 
