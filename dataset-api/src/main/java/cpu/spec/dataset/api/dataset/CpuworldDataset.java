@@ -1,7 +1,7 @@
 package cpu.spec.dataset.api.dataset;
 
-import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;
+import cpu.spec.dataset.api.mapping.CsvColumnNameMapping;
 
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -14,20 +14,20 @@ public class CpuworldDataset extends Dataset {
     }
 
     /**
-     * @return column mapping with fallbacks for cpu data (readonly)
+     * @return column mapping by header names with fallbacks for cpu data (readonly)
      */
     @Override
-    public CsvColumnIndexMapping getColumnMapping() {
-        CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
-        mapping.name = new int[]{1};
-        mapping.productCollection = new int[]{216};
-        mapping.cores = new int[]{268};
-        mapping.threads = new int[]{269};
-        mapping.baseFrequency = new int[]{204};
-        mapping.maxFrequency = new int[]{215};
-        mapping.tdp = new int[]{270};
-        mapping.launchDate = new int[]{};
-        mapping.sourceUrl = new int[]{273};
+    public CsvColumnNameMapping getColumnNameMapping() {
+        CsvColumnNameMapping mapping = new CsvColumnNameMapping();
+        mapping.name = new String[]{"CpuName"};
+        mapping.productCollection = new String[]{"Microarchitecture"};
+        mapping.cores = new String[]{"The number of CPU cores"};
+        mapping.threads = new String[]{"The number of threads"};
+        mapping.baseFrequency = new String[]{"Frequency"};
+        mapping.maxFrequency = new String[]{"Maximum turbo frequency"};
+        mapping.tdp = new String[]{"Thermal Design Power"};
+        mapping.launchDate = new String[]{};
+        mapping.sourceUrl = new String[]{"SourceUrl"};
         return mapping;
     }
 

@@ -1,8 +1,9 @@
 package cpu.spec.dataset.api.dataset;
 
-import cpu.spec.dataset.api.mapping.CsvColumnIndexMapping;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;
+import cpu.spec.dataset.api.mapping.CsvColumnNameMapping;
 
+import java.time.Year;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,20 +14,31 @@ public class IntelDataset extends Dataset {
     }
 
     /**
-     * @return column mapping with fallbacks for cpu data (readonly)
+     * @return column mapping by header names with fallbacks for cpu data (readonly)
      */
     @Override
-    public CsvColumnIndexMapping getColumnMapping() {
-        CsvColumnIndexMapping mapping = new CsvColumnIndexMapping();
-        mapping.name = new int[]{1};
-        mapping.productCollection = new int[]{179};
-        mapping.cores = new int[]{33};
-        mapping.threads = new int[]{222};
-        mapping.baseFrequency = new int[]{26};
-        mapping.maxFrequency = new int[]{27, 19};
-        mapping.tdp = new int[]{139, 29, 31, 194};
-        mapping.launchDate = new int[]{17, 68};
-        mapping.sourceUrl = new int[]{246};
+    public CsvColumnNameMapping getColumnNameMapping() {
+        CsvColumnNameMapping mapping = new CsvColumnNameMapping();
+        mapping.name = new String[]{"CpuName"};
+        mapping.productCollection = new String[]{"Product Collection"};
+        mapping.cores = new String[]{"Total Cores"};
+        mapping.threads = new String[]{"Total Threads"};
+        mapping.baseFrequency = new String[]{
+                "Processor Base Frequency",
+                "Performance-core Base Frequency"};
+        mapping.maxFrequency = new String[]{
+                "Max Turbo Frequency",
+                "Intel® Turbo Boost Technology 2.0 Frequency‡",
+                "Performance-core Max Turbo Frequency",
+                "Burst Frequency"};
+        mapping.tdp = new String[]{
+                "TDP",
+                "Processor Base Power",
+                "Configurable TDP-up",
+                "Configurable TDP-down",
+                "Scenario Design Power (SDP)"};
+        mapping.launchDate = new String[]{"Launch Date"};
+        mapping.sourceUrl = new String[]{"SourceUrl"};
         return mapping;
     }
 

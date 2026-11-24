@@ -93,7 +93,7 @@ public class CpuSpecification {
             return null;
         }
         for (int index : indexOptions) {
-            if (!row[index].isBlank()) {
+            if (index < row.length && !row[index].isBlank()) {
                 return index;
             }
         }
