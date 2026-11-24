@@ -38,7 +38,7 @@ public class AmpereDataset extends Dataset {
         modification.threads = null;
         modification.baseFrequency = (s -> {
             if (s == null) return null;
-            int mhz = (int) Float.parseFloat(s) * 1000;
+            int mhz = Math.round(Float.parseFloat(s) * 1000);
             return Integer.toString(mhz);
         });
         modification.maxFrequency = null;

@@ -46,10 +46,7 @@ public class BenchmarkDataset extends Dataset {
             if (s == null) return null;
             if (s.contains("GHz")) {
                 s = s.replaceAll("GHz", "").trim();
-                if (s.endsWith(".0")) {
-                    s = s.substring(0, s.length() - 2);
-                }
-                int mhz = (int) Float.parseFloat(s) * 1000;
+                int mhz = Math.round(Float.parseFloat(s) * 1000);
                 return Integer.toString(mhz);
             } else if (s.contains("MHz")) {
                 return s.replaceAll("MHz", "").trim();
@@ -79,7 +76,7 @@ public class BenchmarkDataset extends Dataset {
         });
         modification.sourceUrl = (s -> {
             if (s == null) return null;
-            return s.substring(1, s.length() - 1);
+            return s.replaceAll("\"", "");
         });
         return modification;
     }
