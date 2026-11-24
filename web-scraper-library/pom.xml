@@ -25,10 +25,6 @@
             <artifactId>selenium-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-        </dependency>
-        <dependency>
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
         </dependency>

@@ -1,18 +1,11 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CpuSpecificationParserTest {
-
-    @BeforeAll
-    static void setup() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @Test
     void testExtractSpecificationSample() throws Exception {
