@@ -1,28 +1,17 @@
 package cpu.spec.scraper.factory;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.util.logging.Logger;
-
 /**
  * Factory to serve chrome drivers with a static evolving configuration.
+ * The matching chromedriver is resolved automatically by the Selenium Manager (built into Selenium since 4.6).
  */
 public abstract class ChromeDriverFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger();
-    private static boolean setup = true;
-
     /**
-     * @return chrome driver with initially executed setup and custom configuration
+     * @return chrome driver with custom configuration
      */
     public static ChromeDriver getDriver() {
-        if (setup) {
-            LOGGER.info("Start chrome driver setup.");
-            WebDriverManager.chromedriver().setup();
-            setup = false;
-            LOGGER.info("Finished chrome driver setup.");
-        }
         ChromeOptions options = new ChromeOptions();
         // Disable browser
         options.addArguments("--headless", "--ignore-certificate-errors");
