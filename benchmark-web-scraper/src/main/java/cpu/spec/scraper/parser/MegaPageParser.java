@@ -4,9 +4,9 @@ import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.ChromeDriverFactory;
 import cpu.spec.scraper.validator.SeleniumValidator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -29,25 +29,24 @@ public abstract class MegaPageParser {
             driver.get(ENTRY_URL);
             Thread.sleep(250);
 
-            WebElement selectElement = validator.findElement(driver, By.name("cputable_length"));
-            Select select = new Select(selectElement);
-            select.selectByVisibleText("All");
-            Thread.sleep(250);
+            // the page length <select> can be covered by a cookie consent overlay (EU),
+            // therefore the DataTables API is used to show all rows instead of clicking the "All" option
+            validator.findElement(driver, By.name("cputable_length"));
+            ((JavascriptExecutor) driver).executeScript("jQuery('#cputable').DataTable().page.len(-1).draw();");
+            Thread.sleep(1000);
 
             WebElement tableBody = validator.findElement(driver, By.cssSelector("#cputable > tbody"));
 
-            List<WebElement> tableRows = validator.findElements(tableBody, By.cssSelector("tr"));
+            // collect all hrefs within a single script call (much faster than one webdriver call per row)
+            @SuppressWarnings("unchecked")
+            List<Object> hrefs = (List<Object>) ((JavascriptExecutor) driver).executeScript(
+                    "return [...arguments[0].querySelectorAll('tr')]" +
+                            ".map(tr => tr.querySelector('a[href]'))" +
+                            ".filter(a => a !== null)" +
+                            ".map(a => a.href);", tableBody);
 
-            for (WebElement row : tableRows) {
-                WebElement aSpec = row.findElement(By.tagName("a"));
-                if (aSpec == null) {
-                    continue;
-                }
-                String href = aSpec.getAttribute("href");
-                if (href == null) {
-                    continue;
-                }
-                href = href.replaceAll("cpu_lookup.php", "cpu.php");
+            for (Object hrefObject : hrefs) {
+                String href = String.valueOf(hrefObject).replaceAll("cpu_lookup.php", "cpu.php");
                 specificationLinks.add(URLDecoder.decode(href, StandardCharsets.UTF_8));
             }
         } catch (Exception exception) {
