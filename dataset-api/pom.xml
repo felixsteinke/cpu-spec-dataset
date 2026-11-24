@@ -23,6 +23,8 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!-- override Spring Boot managed version for compatibility with newer JDKs (21+) -->
+        <lombok.version>1.18.48</lombok.version>
     </properties>
 
     <dependencies>
@@ -71,6 +73,20 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- JDK 23+ no longer runs annotation processors from the classpath by default -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
