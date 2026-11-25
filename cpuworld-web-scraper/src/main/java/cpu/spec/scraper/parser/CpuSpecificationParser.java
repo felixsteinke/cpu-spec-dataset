@@ -1,15 +1,22 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
+import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.factory.ChromeDriverFactory;
-import cpu.spec.scraper.validator.SeleniumValidator;
-import org.openqa.selenium.By;
+import cpu.spec.scraper.validator.JsoupValidator;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
-import java.util.List;
+import java.util.Map;
 
 public abstract class CpuSpecificationParser {
+    /**
+     * labels renamed on the website -> column name of the dataset (keeps the dataset columns stable)
+     */
+    private static final Map<String, String> KEY_ALIASES = Map.of("Processor codename", "Processor core");
 
     /**
      * @param url <a href="https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html">Cpu World Specification Page</a>
@@ -18,53 +25,49 @@ public abstract class CpuSpecificationParser {
      */
     public static CpuSpecificationModel extractSpecification(String url) throws Exception {
         WebDriver driver = ChromeDriverFactory.getDriver();
-        SeleniumValidator validator = new SeleniumValidator(url);
-        CpuSpecificationModel specification = new CpuSpecificationModel();
-
         try {
             driver.get(url);
-            specification.id = selectId(url);
-            specification.sourceUrl = url;
-
-            // Wait for the dynamic content to load (adjust the wait time according to your needs)
+            // Wait for the dynamic content to load
             Thread.sleep(250);
-
-            // Extract the CPU name from the page
-            WebElement mainDiv = driver.findElement(By.cssSelector("div#AB_B"));
-            if (mainDiv != null) {
-                WebElement titleElement = mainDiv.findElement(By.tagName("h1"));
-                if (titleElement != null) {
-                    specification.cpuName = titleElement.getText();
-                }
-            }
-            // Extract the specification table
-            WebElement infoDiv = validator.findElement(driver, By.cssSelector("div#GET_INFO"));
-
-            WebElement specTable = validator.findElement(infoDiv, By.cssSelector("table.spec_table"));
-
-            // Iterate over each row of the table
-            List<WebElement> tableRows = specTable.findElements(By.tagName("tr"));
-            for (WebElement tableRow : tableRows) {
-                List<WebElement> tdList = tableRow.findElements(By.tagName("td"));
-                if (tdList.size() < 2) {
-                    continue;
-                }
-                String dataKey = cleanValue(tdList.get(0).getText());
-                if (dataKey.isBlank() || isKeyIgnored(dataKey)) {
-                    continue;
-                }
-                String dataValue = cleanValue(tdList.get(1).getText());
-                if (dataValue.isBlank()) {
-                    specification.dataValues.put(dataKey, null);
-                    continue;
-                }
-                specification.dataValues.put(dataKey, dataValue);
-            }
-        } catch (Exception exception) {
+            return parseSpecification(Jsoup.parse(driver.getPageSource(), url), url);
+        } finally {
             driver.quit();
-            throw exception;
         }
-        driver.quit();
+    }
+
+    /**
+     * The specification table collapses most of its sections, so the values are read from the page source
+     * (independent of their visibility) instead of the rendered text.
+     *
+     * @param page specification page
+     * @param url  source url of the page
+     * @return cpu specification model
+     * @throws ElementNotFoundException if title or specification table cannot be found
+     */
+    public static CpuSpecificationModel parseSpecification(Document page, String url) throws ElementNotFoundException {
+        JsoupValidator validator = new JsoupValidator(url);
+        // remove detail popups and scripts, they are not part of the values
+        page.select(".spec_detd, script, style").remove();
+
+        CpuSpecificationModel specification = new CpuSpecificationModel();
+        specification.id = selectId(url);
+        specification.sourceUrl = url;
+        specification.cpuName = validator.selectFirst(page, "div#AB_B h1").text().trim();
+
+        Element specTable = validator.selectFirst(page, "div#GET_INFO table.spec_table");
+        for (Element tableRow : specTable.select("tr")) {
+            Elements cells = tableRow.select("> td");
+            if (cells.size() < 2) {
+                continue;
+            }
+            String dataKey = cleanValue(cells.get(0).text());
+            dataKey = KEY_ALIASES.getOrDefault(dataKey, dataKey);
+            if (dataKey.isBlank() || isKeyIgnored(dataKey) || specification.dataValues.containsKey(dataKey)) {
+                continue;
+            }
+            String dataValue = cleanValue(cells.get(1).text());
+            specification.dataValues.put(dataKey, dataValue.isBlank() ? null : dataValue);
+        }
         return specification;
     }
 
