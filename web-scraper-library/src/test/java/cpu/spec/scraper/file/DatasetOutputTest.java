@@ -6,8 +6,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DatasetOutputTest {
     @TempDir
@@ -21,38 +23,58 @@ class DatasetOutputTest {
 
     @Test
     void newDatasetIsWritten() throws Exception {
-        assertEquals(dir.resolve("x-cpus.csv"), DatasetOutput.resolve(dir.toString(), "x-cpus.csv", 3));
+        assertEquals(dataset(), write("cpu0", "cpu1"));
+        assertEquals(List.of("cpu0", "cpu1"), names(dataset()));
     }
 
     @Test
-    void completeRunReplacesDataset() throws Exception {
+    void runIsMergedIntoDataset() throws Exception {
         writeDataset(10);
-        assertEquals(dir.resolve("x-cpus.csv"), DatasetOutput.resolve(dir.toString(), "x-cpus.csv", 9));
-    }
-
-    @Test
-    void incompleteRunKeepsDataset() throws Exception {
-        writeDataset(10);
-        assertEquals(dir.resolve("x-cpus.incomplete.csv"), DatasetOutput.resolve(dir.toString(), "x-cpus.csv", 7));
+        assertEquals(dataset(), write("cpu8", "cpu10"));
+        List<String> expected = IntStream.rangeClosed(0, 10).mapToObj(i -> "cpu" + i).toList();
+        assertEquals(expected, names(dataset()), "cpus the run did not find are kept, new ones appended");
     }
 
     @Test
     void forcedRunReplacesDataset() throws Exception {
         writeDataset(10);
         System.setProperty("scraper.force", "true");
-        assertEquals(dir.resolve("x-cpus.csv"), DatasetOutput.resolve(dir.toString(), "x-cpus.csv", 1));
+        assertEquals(dataset(), write("cpu8", "cpu10"));
+        assertEquals(List.of("cpu8", "cpu10"), names(dataset()));
     }
 
     @Test
-    void smokeTestNeverReplacesDataset() throws Exception {
+    void emptyRunKeepsDataset() throws Exception {
+        writeDataset(10);
+        assertThrows(IllegalStateException.class, () -> write());
+        assertEquals(10, names(dataset()).size());
+    }
+
+    @Test
+    void smokeTestNeverChangesDataset() throws Exception {
         writeDataset(10);
         System.setProperty("scraper.limit", "2");
-        assertEquals(dir.resolve("x-cpus.limited.csv"), DatasetOutput.resolve(dir.toString(), "x-cpus.csv", 2));
+        assertEquals(dir.resolve("x-cpus.limited.csv"), write("cpu0", "cpu10"));
+        assertEquals(List.of("cpu0", "cpu10"), names(dir.resolve("x-cpus.limited.csv")));
+        assertEquals(10, names(dataset()).size());
+    }
+
+    private Path write(String... names) throws Exception {
+        List<List<String>> rows = List.of(names).stream().map(List::of).toList();
+        return DatasetOutput.write(dir.toString(), "x-cpus.csv", file -> CsvWriter.write(file, List.of("CpuName"), rows));
+    }
+
+    private Path dataset() {
+        return dir.resolve("x-cpus.csv");
+    }
+
+    private static List<String> names(Path file) throws Exception {
+        return CsvReader.read(file).stream().map(row -> row.get("CpuName")).toList();
     }
 
     private void writeDataset(int rows) throws Exception {
-        StringBuilder csv = new StringBuilder("Name\n");
+        StringBuilder csv = new StringBuilder("CpuName\n");
         for (int i = 0; i < rows; i++) csv.append("cpu").append(i).append('\n');
-        Files.writeString(dir.resolve("x-cpus.csv"), csv);
+        Files.writeString(dataset(), csv);
     }
 }

@@ -30,8 +30,7 @@ public class CpuworldScraperApp {
             throw new IllegalStateException("No CPU Specifications extracted (blocked requests or changed website structure).");
         }
 
-        Path output = DatasetOutput.resolve(outputDir, outputFile, specifications.size());
-        CpuSpecificationWriter.writeCsvFile(specifications, output.toString());
+        Path output = DatasetOutput.write(outputDir, outputFile, file -> CpuSpecificationWriter.writeCsvFile(specifications, file.toString()));
         LOGGER.info("Finished Cpu World Scraper. Output at: " + output);
     }
 

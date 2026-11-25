@@ -16,6 +16,8 @@ class CsvReaderTest {
     void parseLine() {
         assertEquals(List.of("AMD Ryzen 5 2600", "AM4", "", "3.9 GHz"), CsvReader.parseLine("AMD Ryzen 5 2600,AM4,,3.9 GHz"));
         assertEquals(List.of("AM2,AM2+", "say \"hi\"", "x"), CsvReader.parseLine("\"AM2,AM2+\",\"say \"\"hi\"\"\",x"));
+        // unquoted fields of the intel and cpu-world datasets can contain quotes
+        assertEquals(List.of("2.99\" x 2.22\"", "the \"N4200\" page", "x"), CsvReader.parseLine("2.99\" x 2.22\",the \"N4200\" page,x"));
     }
 
     @Test

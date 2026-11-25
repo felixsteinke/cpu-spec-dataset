@@ -139,16 +139,29 @@ tests and prints a summary. It exits with `1` if the build or the validation fai
 |--------------------------------|---------------------------------------------------------------------------------|
 | `-Dscraper.limit=5`            | Smoke test with the first 5 pages per level, written to `dataset/*.limited.csv` |
 | `-Dscraper.delay=500`          | Wait 500 ms between detail page requests (Intel)                                |
-| `-Dscraper.force=true`         | Replace a dataset even if the new run has much fewer records                    |
+| `-Dscraper.force=true`         | Replace the dataset instead of merging the scraped records into it              |
 
 Safeguards:
 
-* __Incomplete runs never replace a dataset:__ if a scraper extracts less than 80 % of the existing records
-  (e.g. blocked requests), it writes `dataset/*.incomplete.csv` instead (ignored by git).
+* __Merge by default:__ the scraped records are merged into the dataset. CPUs of the dataset are updated, new CPUs are
+  appended and CPUs the run did not find (removed from the website or blocked requests) keep their row, so no id of the
+  Dataset API disappears. A CPU is identified by its name and, if the dataset has one, its `CpuId`.
 * __Stable API:__ the CPU name is the id of the Dataset API. The scrapers keep the names, columns and value formats of
   the previous dataset version, new columns are appended (benchmark: CPUs keep their previous name and values the
   source does not provide anymore).
 * The Intel scraper stops after 25 failed specification pages in a row (requests blocked).
+
+### Merge Records manually
+
+Merges a csv file with records into its dataset, the same way the scrapers do by default, e.g. the
+`dataset/*.incomplete.csv` of an incomplete run with an older version (which wrote the records next to the dataset):
+
+```shell
+./scripts/merge-dataset.sh dataset/intel-cpus.incomplete.csv           # into dataset/intel-cpus.csv
+./scripts/merge-dataset.sh records.csv dataset/intel-cpus.csv          # into the given dataset
+```
+
+Validate the merged dataset with the dataset tests above and review it with `git diff --stat dataset/`.
 
 ### [AMD Dataset](dataset/amd-cpus.csv)
 

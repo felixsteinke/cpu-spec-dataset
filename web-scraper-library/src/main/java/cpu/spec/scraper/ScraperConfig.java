@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  *     <li>{@code scraper.limit}: only process the first N pages of each level, e.g. series and specification pages
  *     (smoke test, output to *.limited.csv)</li>
  *     <li>{@code scraper.delay}: milliseconds to wait between detail page requests</li>
- *     <li>{@code scraper.force}: overwrite the dataset even if the new run has much fewer records</li>
+ *     <li>{@code scraper.force}: replace the dataset instead of merging the records into it</li>
  * </ul>
  */
 public abstract class ScraperConfig {

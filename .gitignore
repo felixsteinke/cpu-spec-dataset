@@ -1,5 +1,5 @@
 dataset/test.csv
-# scraper outputs that never replace a dataset (incomplete run / smoke test)
+# scraper outputs that are no dataset: records of incomplete runs (older versions, see scripts/merge-dataset.sh) and smoke tests
 dataset/*.incomplete.csv
 dataset/*.limited.csv
 dataset-api/src/main/resources/dataset
