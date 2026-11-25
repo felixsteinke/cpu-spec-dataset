@@ -1,0 +1,54 @@
+name: CI
+
+# Builds all modules and runs the tests on every push to main, or manually with "Run workflow".
+# Tests that load external web pages (@Tag("live")) are excluded, the Scraper Smoke Test workflow covers them.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    services:
+      # database for the Spring Boot tests of the Dataset API (see dataset-api/src/main/resources/application.properties)
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: cpu_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+
+      - name: Copy Datasets into the Dataset API
+        run: |
+          mkdir -p dataset-api/src/main/resources/dataset
+          cp dataset/*-cpus.csv dataset-api/src/main/resources/dataset/
+
+      - name: Build and Test
+        run: mvn -B -ntp verify -DexcludedGroups=live

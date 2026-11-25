@@ -1,0 +1,58 @@
+name: Scraper Smoke Test
+
+# Manually checks whether the scrapers can still read their web pages: each scraper runs with -Dscraper.limit=1
+# (only the first page of each level, e.g. 1 Intel series and 1 specification page) and has to return at least
+# one CPU. The datasets are not changed, the logs and outputs (dataset/*.limited.csv) are uploaded as artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      scrapers:
+        description: Scrapers to test (space separated)
+        type: string
+        default: amd ampere benchmark intel cpuworld
+
+jobs:
+  smoke-test:
+    name: Smoke Test
+    runs-on: ubuntu-latest  # includes Google Chrome for the benchmark and cpu-world scrapers
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash  # -eo pipefail: the exit code of the script is kept through tee
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+
+      - name: Run Scrapers with Limit
+        env:
+          SCRAPERS: ${{ inputs.scrapers }}
+          JAVA_OPTS: -Dscraper.limit=1
+        run: |
+          mkdir -p logs
+          # word splitting of the scraper list is intended, the script rejects unknown scrapers
+          ./scripts/scrape-all.sh $SCRAPERS | tee logs/run.txt
+
+      - name: Write Job Summary
+        if: ${{ !cancelled() }}
+        run: |
+          { echo '```'; cat logs/run.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Logs and Outputs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: scraper-smoke-test
+          path: |
+            logs/
+            dataset/*.limited.csv
+          retention-days: 14

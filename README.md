@@ -107,6 +107,20 @@ updates and fixes. The Maven project version (all `pom.xml` files) matches the r
    does not match `v` + the version of all `pom.xml` files, or if the image `v2.1` already exists (published versions
    are never overwritten).
 
+## Workflows
+
+| Workflow                                                       | Trigger                  | Description                                                                                                                     |
+|----------------------------------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| [CI](.github/workflows/ci.yml)                                 | push to `main`, manual   | Builds all modules and runs the tests (with MySQL), except the tests loading live web pages                                     |
+| [Scraper Smoke Test](.github/workflows/scraper-smoke-test.yml) | manual                   | Runs the scrapers with `-Dscraper.limit=1`, each has to return at least one CPU (datasets unchanged, logs as artifact)          |
+| [Dataset Update](.github/workflows/dataset-update.yml)         | manual                   | Runs the scrapers and opens a pull request from the branch `dataset-update`, stops early if the branch already exists           |
+| [Docker-Image](.github/workflows/docker-image.yml)             | release, manual          | Builds and publishes the image, see [Release](#release)                                                                         |
+
+* Tests loading live web pages are tagged with `@Tag("live")`, run the others with `mvn verify -DexcludedGroups=live`.
+* The __Dataset Update__ workflow requires __Settings > Actions > General > Allow GitHub Actions to create and approve
+  pull requests__. After merging, the branch is deleted (repository setting), so the next update can run.
+* Websites may block requests from GitHub's runners. Then run [the script](#recreate-all-datasets) on another machine.
+
 ## Dataset Update
 
 All updates to the dataset need to carefully reviewed. The columns are mapped by their __header name__ in the
@@ -129,14 +143,16 @@ automatically by Selenium) and runs on Linux, macOS and Windows (Git Bash):
 ```
 
 The script builds the project, runs the scrapers (logs in `logs/`), validates the datasets with the Dataset API
-tests and prints a summary. Review the result with `git diff --stat dataset/` before committing it.
+tests and prints a summary. It exits with `1` if the build or the validation failed and with `2` if a scraper failed
+(the other datasets are valid). Review the result with `git diff --stat dataset/` before committing it, or let the
+[Dataset Update](#workflows) workflow open a pull request.
 
-| JVM Option (`JAVA_OPTS="..."`)              | Description                                                                |
-|---------------------------------------------|----------------------------------------------------------------------------|
-| `-Dscraper.limit=5`                         | Smoke test with 5 detail pages, written to `dataset/*.limited.csv`         |
-| `-Dscraper.delay=500`                       | Wait 500 ms between detail page requests (Intel)                           |
-| `-Dscraper.force=true`                      | Replace a dataset even if the new run has much fewer records               |
-| `-Djavax.net.ssl.trustStoreType=Windows-ROOT` | Use the Windows certificate store (TLS-intercepting proxy, `PKIX` error) |
+| JVM Option (`JAVA_OPTS="..."`)                | Description                                                                     |
+|-----------------------------------------------|---------------------------------------------------------------------------------|
+| `-Dscraper.limit=5`                           | Smoke test with the first 5 pages per level, written to `dataset/*.limited.csv` |
+| `-Dscraper.delay=500`                         | Wait 500 ms between detail page requests (Intel)                                |
+| `-Dscraper.force=true`                        | Replace a dataset even if the new run has much fewer records                    |
+| `-Djavax.net.ssl.trustStoreType=Windows-ROOT` | Use the Windows certificate store (TLS-intercepting proxy, `PKIX` error)        |
 
 Safeguards:
 
