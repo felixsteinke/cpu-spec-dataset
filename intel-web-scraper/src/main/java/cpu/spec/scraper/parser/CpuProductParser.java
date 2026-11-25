@@ -25,7 +25,7 @@ public abstract class CpuProductParser {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static List<String> extractSeriesLinks() throws IOException, ElementNotFoundException {
-        Document page = JsoupFactory.getConnection(ENTRY_URL).get();
+        Document page = JsoupFactory.getCrawlerConnection(ENTRY_URL).get();
         return parseSeriesLinks(page);
     }
 

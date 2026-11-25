@@ -40,7 +40,8 @@ class CpuProductParserTest {
     @Test
     void testExtractSeriesLinks() throws ElementNotFoundException, IOException {
         List<String> actual = CpuProductParser.extractSeriesLinks();
-        assertTrue(actual.size() >= 114, "size >= 114");
+        // 110 processor series in 8 generations (November 2026)
+        assertTrue(actual.size() >= 100, "size >= 100");
         assertTrue(actual.getFirst().contains("/products/series/"), "sample contains '/products/series/'");
     }
 }

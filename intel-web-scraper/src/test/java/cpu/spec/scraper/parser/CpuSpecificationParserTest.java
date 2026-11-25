@@ -17,12 +17,22 @@ class CpuSpecificationParserTest {
     void parseSpecification() throws ElementNotFoundException {
         // structure of a specification page (shortened)
         String html = """
-                <div class="product-details"><h1><span itemprop="name">Intel® Pentium® Gold G6405T Processor</span></h1></div>
-                <div id="specs-1-0-1">
-                  <div class="tech-section"><div class="tech-label"><span>Total Cores</span></div><div class="tech-data"><span>2</span></div></div>
-                  <div class="tech-section"><div class="tech-label">Processor Base Frequency</div><div class="tech-data"> 3.50 GHz </div></div>
-                  <div class="tech-section"><div class="tech-label">Launch Date</div><div class="tech-data">Q1'21</div></div>
-                  <div class="tech-section"><div class="tech-label">Datasheet</div></div>
+                <h1 class="cmp-teaser__title">Intel® Pentium® Gold G6405T Processor<span class="cmp-teaser__description">Specifications</span></h1>
+                <div class="cmp-list-section__section" id="list-section-spec-0">
+                  <div class="cmp-title"><h2 class="cmp-title__text">Essentials</h2></div>
+                  <table class="cmp-list-section__table"><tbody>
+                    <tr><th scope="row" class="key"><div class="row-key"> Total Cores <button class="info-icon" data-info-title="Total Cores"></button></div></th>
+                        <td class="value"><div class="row-value"> 2 <button class="copy-icon" data-copy-text="2"></button></div></td></tr>
+                    <tr><th scope="row" class="key"><div class="row-key">Processor Base Frequency</div></th><td class="value"><div class="row-value"> 3.50 GHz </div></td></tr>
+                    <tr><th scope="row" class="key"><div class="row-key">GPU Name<small><sup>‡</sup></small></div></th><td class="value"><div class="row-value">Intel® UHD Graphics 610</div></td></tr>
+                    <tr><th scope="row" class="key"><div class="row-key">T<sub>JUNCTION</sub></div></th><td class="value"><div class="row-value">100°C</div></td></tr>
+                    <tr><th scope="row" class="key"><div class="row-key">Datasheet</div></th></tr>
+                  </tbody></table>
+                </div>
+                <div class="cmp-list-section__section" id="list-section-spec-1">
+                  <table class="cmp-list-section__table"><tbody>
+                    <tr><th scope="row" class="key"><div class="row-key">Launch Date</div></th><td class="value"><div class="row-value">Q1'21</div></td></tr>
+                  </tbody></table>
                 </div>""";
         CpuSpecificationModel spec = CpuSpecificationParser.parseSpecification(Jsoup.parse(html), URL);
         assertEquals("201900", spec.id);
@@ -30,13 +40,15 @@ class CpuSpecificationParserTest {
         assertEquals(URL, spec.sourceUrl);
         assertEquals("2", spec.dataValues.get("Total Cores"));
         assertEquals("3.50 GHz", spec.dataValues.get("Processor Base Frequency"));
+        assertEquals("Intel® UHD Graphics 610", spec.dataValues.get("GPU Name‡"), "footnote mark without space (dataset header)");
+        assertEquals("100°C", spec.dataValues.get("TJUNCTION"), "subscript without space (dataset header)");
         assertEquals("Q1'21", spec.dataValues.get("Launch Date"));
         assertFalse(spec.dataValues.containsKey("Datasheet"), "label without value");
     }
 
     @Test
     void parseChangedPageStructure() {
-        String withoutSpecs = "<div class=\"product-details\"><span itemprop=\"name\">Intel® Core™ i9</span></div>";
+        String withoutSpecs = "<h1 class=\"cmp-teaser__title\">Intel® Core™ i9<span class=\"cmp-teaser__description\">Specifications</span></h1>";
         assertThrows(ElementNotFoundException.class, () -> CpuSpecificationParser.parseSpecification(Jsoup.parse(withoutSpecs), URL));
         assertThrows(ElementNotFoundException.class, () -> CpuSpecificationParser.parseSpecification(Jsoup.parse("<h1>Intel</h1>"), URL));
     }

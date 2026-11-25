@@ -12,12 +12,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public abstract class CpuSpecificationParser {
-    // xPath: divs with class='product-details' -> flexible element with itemprop=name
-    private static final String TITLE_QUERY = ".//div[@class='product-details']//*[@itemprop='name']";
-    // xPath: divs with id containing "spec" -> divs with class containing "tech-section" (one label / value pair)
-    private static final String SECTION_QUERY = ".//div[contains(@id, 'spec')]//div[contains(@class, 'tech-section')]";
-    private static final String LABEL_QUERY = ".//div[contains(@class, 'tech-label')]";
-    private static final String DATA_QUERY = ".//div[contains(@class, 'tech-data')]";
+    // css: page title, its own text is the cpu name (without the nested description "Specifications")
+    private static final String TITLE_QUERY = "h1.cmp-teaser__title";
+    // css: rows of the specification sections (one label / value pair)
+    private static final String ROW_QUERY = "div[id^=list-section-spec] tr";
+    private static final String LABEL_QUERY = "th.key";
+    private static final String DATA_QUERY = "td.value";
 
     /**
      * @param url <a href="https://www.intel.com/content/www/us/en/products/sku/201900/intel-pentium-gold-g6405t-processor-4m-cache-3-50-ghz/specifications.html">Intel Processor Specification Page</a>
@@ -26,7 +26,7 @@ public abstract class CpuSpecificationParser {
      * @throws ElementNotFoundException if element cannot be retrieved
      */
     public static CpuSpecificationModel extractSpecification(String url) throws IOException, ElementNotFoundException {
-        Document page = JsoupFactory.getConnection(url).get();
+        Document page = JsoupFactory.getCrawlerConnection(url).get();
         return parseSpecification(page, url);
     }
 
@@ -34,22 +34,22 @@ public abstract class CpuSpecificationParser {
      * @throws ElementNotFoundException if the title or the specification sections cannot be found
      */
     public static CpuSpecificationModel parseSpecification(Document page, String url) throws ElementNotFoundException {
-        Element titleElement = page.selectXpath(TITLE_QUERY).first();
-        if (titleElement == null) {
+        Element titleElement = page.selectFirst(TITLE_QUERY);
+        if (titleElement == null || titleElement.ownText().isBlank()) {
             throw new ElementNotFoundException("document", TITLE_QUERY, url);
         }
-        Elements specElements = page.selectXpath(SECTION_QUERY);
+        Elements specElements = page.select(ROW_QUERY);
         if (specElements.isEmpty()) {
-            throw new ElementNotFoundException("document", SECTION_QUERY, url);
+            throw new ElementNotFoundException("document", ROW_QUERY, url);
         }
 
         CpuSpecificationModel specification = new CpuSpecificationModel();
         specification.id = selectId(url);
-        specification.cpuName = titleElement.text().trim();
+        specification.cpuName = titleElement.ownText().trim();
         specification.sourceUrl = url;
         for (Element specElement : specElements) {
-            Element dataKeyElement = specElement.selectXpath(LABEL_QUERY).first();
-            Element dataValue = specElement.selectXpath(DATA_QUERY).first();
+            Element dataKeyElement = specElement.selectFirst(LABEL_QUERY);
+            Element dataValue = specElement.selectFirst(DATA_QUERY);
             if (dataKeyElement != null && dataValue != null && !isKeyIgnored(dataKeyElement.text())) {
                 specification.dataValues.put(dataKeyElement.text().trim(), dataValue.text().trim());
             }
