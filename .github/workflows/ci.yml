@@ -2,6 +2,7 @@ name: CI
 
 # Builds all modules and runs the tests on every push to main, or manually with "Run workflow".
 # Tests that load external web pages (@Tag("live")) are excluded, the Scraper Smoke Test workflow covers them.
+# Locally the same tests run with: mvn verify -DexcludedGroups=live (requires a MySQL database, see the README).
 on:
   push:
     branches: [ main ]

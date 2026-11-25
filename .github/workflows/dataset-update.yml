@@ -4,6 +4,10 @@ name: Dataset Update
 # - Stops before scraping if the branch already exists (merge or close the open update and delete the branch first).
 # - Datasets of failed or incomplete scrapers stay unchanged. The pull request contains the other datasets and the
 #   run fails afterwards, so the failure is visible. Nothing is committed if the dataset validation fails.
+# - After merging, the branch is deleted (Settings > General > "Automatically delete head branches"), so the next
+#   update can run.
+# - Websites may block requests from GitHub's runners (see the Scraper Smoke Test). Then run scripts/scrape-all.sh on
+#   another machine and commit the datasets manually.
 # Requires: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
 on:
   workflow_dispatch:
