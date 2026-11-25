@@ -1,8 +1,12 @@
 # CPU Specification Dataset
 
-Dataset for CPU specifications from Intel, AMD and Ampere, extended by CPU benchmark and CPU-World data.
+Open dataset of CPU specifications for Intel, AMD and Ampere processors as CSV files, extended by PassMark CPU benchmark
+scores and CPU-World data. It covers more than 4,000 desktop, laptop and server processors (e.g. Intel Core and Xeon,
+AMD Ryzen and EPYC, Ampere Altra and AmpereOne) with cores, threads, clock speeds, cache, TDP, socket and launch date,
+scraped from the official manufacturer websites (Intel ARK, AMD). The data is available as CSV files, REST API and
+Docker image.
 
-## Table of Content
+## Table of Contents
 
 * [Raw Datasets](dataset)
 * [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
@@ -37,7 +41,10 @@ cd dataset-api
 mvn spring-boot:run
 ```
 
-Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
+Endpoints at `http://localhost:8080` (Swagger UI at `/swagger-ui.html`):
+
+* `GET /api/cpu-dataset/{name}`: CPU with exactly this name
+* `GET /api/cpu-dataset?contains=xeon&contains=8380`: all CPUs whose name contains every condition (ignore case)
 
 <details>
   <summary>Configurations</summary>
@@ -55,6 +62,8 @@ Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 </details>
 
 ## Container Image
+
+The Dataset API requires a MySQL database, e.g. as container:
 
 ```shell
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=cpu_db -p 3306:3306 -d mysql:8
@@ -107,19 +116,55 @@ updates and fixes. The Maven project version (all `pom.xml` files) matches the r
    does not match `v` + the version of all `pom.xml` files, or if the image `v2.1` already exists (published versions
    are never overwritten).
 
-## Dataset Update
-
-All updates to the dataset need to carefully reviewed. The columns are mapped by their __header name__ in the
-corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dataset) for the __Dataset API__.
-If a regenerated dataset renames or drops a mapped column, the dataset tests fail:
-
-```shell
-cd dataset-api
-mvn test -Dtest="CsvMapperTest,*DatasetTest"
-```
+## Datasets
 
 > __Previous datasets:__ the datasets are only kept in their latest version, older versions are in the git history
 > (e.g. CPUs that were removed from the manufacturer websites).
+
+### [AMD Dataset](dataset/amd-cpus.csv)
+
+Extracted from the specification tables (client and server processors) of
+[https://www.amd.com/en/products/specifications/processors.html](https://www.amd.com/en/products/specifications/processors.html)
+with the [AMD Web Scraper](amd-web-scraper/src/main/java/cpu/spec/scraper). The pages embed the same data the
+__Export__ button of the table uses (1 request per page, a few seconds).
+
+<details>
+  <summary>Manual Export (fallback)</summary>
+
+![amd-csv-export](.docs/amd-csv-export.png)
+
+</details>
+
+### [Ampere Dataset](dataset/ampere-cpus.csv)
+
+Extracted from the SKU tables of the product briefs
+([Ampere Altra](https://amperecomputing.com/briefs/ampere-altra-family-product-brief),
+[AmpereOne](https://amperecomputing.com/briefs/ampereone-family-product-brief),
+[AmpereOne M](https://amperecomputing.com/briefs/ampereone-m-product-brief))
+with the [Ampere Web Scraper](ampere-web-scraper/src/main/java/cpu/spec/scraper).
+
+### [Intel Dataset](dataset/intel-cpus.csv)
+
+Extracted from
+[https://www.intel.com/content/www/us/en/ark.html](https://www.intel.com/content/www/us/en/ark.html)
+with the [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper) (about 3,000 specification pages, run a
+smoke test with `-Dscraper.limit=5` first).
+
+### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
+
+Extracted from the data table of [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html)
+(all CPUs with specifications and benchmark scores, 1 page load) with the
+[Benchmark Web Scraper](benchmark-web-scraper/src/main/java/cpu/spec/scraper) (Chrome).
+
+### [CPU World Dataset](dataset/cpuworld-cpus.csv)
+
+> __Frozen dataset:__ cpu-world denies automated requests (HTTP 403 for bots, data center IP ranges and the scraping
+> of its content), so the dataset of July 2023 (243 Intel Xeon Platinum & Gold CPUs) is kept as it is. The scraper is
+> excluded from the default runs of `scripts/scrape-all.sh` and the workflows and only runs if it is listed explicitly.
+
+Extracted from [https://www.cpu-world.com/CPUs/CPU.html](https://www.cpu-world.com/CPUs/CPU.html)
+(Intel Xeon Platinum & Gold, waits 3 - 10 s between pages) with the
+[CPU World Web Scraper](cpuworld-web-scraper/src/main/java/cpu/spec/scraper) (Chrome).
 
 ### Recreate all Datasets
 
@@ -134,6 +179,13 @@ automatically by Selenium) and runs on Linux, macOS and Windows (Git Bash):
 The script builds the project, runs the scrapers (logs in `logs/`), validates the datasets with the Dataset API
 tests and prints a summary. It exits with `1` if the build or the validation failed and with `2` if a scraper failed
 (the other datasets are valid). Review the result with `git diff --stat dataset/` before committing it.
+
+A single scraper runs on its own after the build, the JVM options below go before `-jar`:
+
+```shell
+cd intel-web-scraper   # or amd-, ampere-, benchmark-, cpuworld-web-scraper
+java -jar ./target/executable.jar
+```
 
 | JVM Option (`JAVA_OPTS="..."`) | Description                                                                     |
 |--------------------------------|---------------------------------------------------------------------------------|
@@ -151,81 +203,13 @@ Safeguards:
   source does not provide anymore).
 * The Intel scraper stops after 25 failed specification pages in a row (requests blocked).
 
-### Merge Records manually
-
-Merges a csv file with records into its dataset, the same way the scrapers do by default, e.g. the
-`dataset/*.incomplete.csv` of an incomplete run with an older version (which wrote the records next to the dataset):
-
-```shell
-./scripts/merge-dataset.sh dataset/intel-cpus.incomplete.csv           # into dataset/intel-cpus.csv
-./scripts/merge-dataset.sh records.csv dataset/intel-cpus.csv          # into the given dataset
-```
-
-Validate the merged dataset with the dataset tests above and review it with `git diff --stat dataset/`.
-
-### [AMD Dataset](dataset/amd-cpus.csv)
-
-Extracted from the specification tables (client and server processors) of
-[https://www.amd.com/en/products/specifications/processors.html](https://www.amd.com/en/products/specifications/processors.html)
-with the responsible __Web Scraper__. The pages embed the same data the __Export__ button of the table uses (1 request
-per page, a few seconds).
+All updates to the datasets need to be carefully reviewed. The columns are mapped by their __header name__ in the
+corresponding [Dataset Class](dataset-api/src/main/java/cpu/spec/dataset/api/dataset) for the __Dataset API__.
+If a regenerated dataset renames or drops a mapped column, the dataset tests fail (`scrape-all.sh` runs them):
 
 ```shell
-cd amd-web-scraper
-java -jar ./target/executable.jar
+cd dataset-api
+mvn test -Dtest="CsvMapperTest,*DatasetTest"
 ```
 
-<details>
-  <summary>Manual Export (fallback)</summary>
-
-![amd-csv-export](.docs/amd-csv-export.png)
-
-</details>
-
-### [Ampere Dataset](dataset/ampere-cpus.csv)
-
-Extracted from the SKU tables of the product briefs
-([Ampere Altra](https://amperecomputing.com/briefs/ampere-altra-family-product-brief),
-[AmpereOne](https://amperecomputing.com/briefs/ampereone-family-product-brief),
-[AmpereOne M](https://amperecomputing.com/briefs/ampereone-m-product-brief))
-with the responsible __Web Scraper__.
-
-```shell
-cd ampere-web-scraper
-java -jar ./target/executable.jar
-```
-
-### [Intel Dataset](dataset/intel-cpus.csv)
-
-Extracted from
-[https://www.intel.com/content/www/us/en/ark.html](https://www.intel.com/content/www/us/en/ark.html)
-with the responsible __Web Scraper__ (about 3,000 specification pages, run a smoke test with `-Dscraper.limit=5` first).
-
-```shell
-cd intel-web-scraper
-java -jar ./target/executable.jar
-```
-
-### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
-
-Extracted from the data table of [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html)
-(all CPUs with specifications and benchmark scores, 1 page load) with the responsible __Web Scraper__ (Chrome).
-
-```shell
-cd benchmark-web-scraper
-java -jar ./target/executable.jar
-```
-
-### [CPU World Dataset](dataset/cpuworld-cpus.csv)
-
-> __Frozen dataset:__ cpu-world denies automated requests (HTTP 403 for bots, data center IP ranges and the scraping
-> of its content), so the dataset of July 2023 (243 Intel Xeon Platinum & Gold CPUs) is kept as it is. The scraper is
-> excluded from the default runs of `scripts/scrape-all.sh` and the workflows and only runs if it is listed explicitly.
-
-Extracted from [https://www.cpu-world.com/CPUs/CPU.html](https://www.cpu-world.com/CPUs/CPU.html)
-(Intel Xeon Platinum & Gold, waits 3 - 10 s between pages) with the responsible __Web Scraper__ (Chrome).
-
-```shell
-cd cpuworld-web-scraper
-java -jar ./target/executable.jar
-```
+To merge a records file into its dataset manually, see [scripts/merge-dataset.sh](scripts/merge-dataset.sh).
