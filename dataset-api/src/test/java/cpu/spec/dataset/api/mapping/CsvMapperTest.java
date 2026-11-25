@@ -46,6 +46,35 @@ class CsvMapperTest {
     }
 
     @Test
+    void amdLaunchYear() {
+        var launchDate = new AmdDataset().getColumnModifications().launchDate;
+        assertEquals("2023", launchDate.apply("10/19/2023"));
+        assertEquals("2016", launchDate.apply("Q3 2016"));
+        assertEquals("2021", launchDate.apply("Q12021"));
+        assertEquals("2025", launchDate.apply("9/16/25"));
+        assertEquals("2017", launchDate.apply("Q217"));
+        assertEquals("2018", launchDate.apply("2Q18"));
+        assertEquals("2017", launchDate.apply("Channel: 7/27/2017, OEM: 9/5/2016"));
+        assertNull(launchDate.apply(""));
+    }
+
+    @Test
+    void amdTdp() {
+        var tdp = new AmdDataset().getColumnModifications().tdp;
+        assertEquals("65", tdp.apply("65W"));
+        assertEquals("120", tdp.apply("45-120W"));
+        assertEquals("25", tdp.apply("15/25W"));
+        assertEquals("120", tdp.apply("115 , 120W"));
+    }
+
+    @Test
+    void ampereNames() {
+        var name = new AmpereDataset().getColumnModifications().name;
+        assertEquals("Ampere Altra M128-30", name.apply("M128-30"), "unchanged name of the previous dataset");
+        assertEquals("AmpereOne® A192-32X", name.apply("AmpereOne® A192-32X"));
+    }
+
+    @Test
     void intelLaunchYear() {
         var launchDate = new IntelDataset().getColumnModifications().launchDate;
         assertEquals("2025", launchDate.apply("Q1'25"));
