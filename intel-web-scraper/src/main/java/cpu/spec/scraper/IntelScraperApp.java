@@ -34,7 +34,8 @@ public class IntelScraperApp {
         String outputDir = FileUtils.getOutputDirectoryPath("dataset");
         String outputFile = "intel-cpus.csv";
 
-        List<String> seriesLinks = CpuProductParser.extractSeriesLinks();
+        // a smoke test also limits the series pages, otherwise it would load all of them for a few specifications
+        List<String> seriesLinks = ScraperConfig.limit(CpuProductParser.extractSeriesLinks());
         LOGGER.info("Extracted " + seriesLinks.size() + " CPU Series Links.");
 
         List<String> specificationLinks = ScraperConfig.limit(extractSpecificationLinks(seriesLinks));
