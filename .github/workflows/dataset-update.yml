@@ -1,0 +1,127 @@
+name: Dataset Update
+
+# Manually runs the scrapers and opens a pull request with the changed datasets from the branch "dataset-update".
+# - Stops before scraping if the branch already exists (merge or close the open update and delete the branch first).
+# - Datasets of failed or incomplete scrapers stay unchanged. The pull request contains the other datasets and the
+#   run fails afterwards, so the failure is visible. Nothing is committed if the dataset validation fails.
+# Requires: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+on:
+  workflow_dispatch:
+    inputs:
+      scrapers:
+        description: Scrapers to run (space separated)
+        type: string
+        default: amd ampere benchmark intel cpuworld
+      force:
+        description: Replace datasets even if a run has much fewer records (scraper.force)
+        type: boolean
+        default: false
+
+concurrency:
+  group: dataset-update
+  cancel-in-progress: false
+
+env:
+  BRANCH: dataset-update
+
+jobs:
+  update:
+    name: Scrape and open Pull Request
+    runs-on: ubuntu-latest  # includes Google Chrome for the benchmark and cpu-world scrapers
+    timeout-minutes: 350    # jobs on GitHub-hosted runners are limited to 6 hours
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash  # -eo pipefail: the exit code of the script is kept through tee
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Stop if Branch already exists
+        run: |
+          rc=0
+          git ls-remote --exit-code --heads origin "refs/heads/$BRANCH" > /dev/null || rc=$?
+          if [ $rc -eq 0 ]; then
+            echo "::error::Branch $BRANCH already exists. Merge or close its pull request and delete the branch first."
+            exit 1
+          elif [ $rc -ne 2 ]; then
+            echo "::error::Could not check whether branch $BRANCH exists (git ls-remote exit code $rc)."
+            exit 1
+          fi
+          echo "Branch $BRANCH does not exist yet."
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+
+      - name: Run Scrapers
+        id: scrape
+        env:
+          SCRAPERS: ${{ inputs.scrapers }}
+          JAVA_OPTS: ${{ inputs.force && '-Dscraper.force=true' || '' }}
+        run: |
+          mkdir -p logs
+          status=0
+          # word splitting of the scraper list is intended, the script rejects unknown scrapers
+          ./scripts/scrape-all.sh $SCRAPERS | tee logs/run.txt || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          { echo '```'; cat logs/run.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          # 2: some scrapers failed, the datasets of the others are valid and still go into the pull request
+          [ $status -eq 0 ] || [ $status -eq 2 ]
+
+      - name: Upload Logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: dataset-update
+          path: |
+            logs/
+            dataset/*.incomplete.csv
+          retention-days: 14
+
+      - name: Commit and open Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCRAPERS: ${{ inputs.scrapers }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git add -- dataset/*-cpus.csv
+          if git diff --cached --quiet; then
+            echo "::notice::The scrapers found no dataset changes, no pull request was created."
+            exit 0
+          fi
+          {
+            echo "Datasets scraped by the [Dataset Update]($RUN_URL) workflow (logs as artifact of the run)."
+            echo
+            echo '```'
+            sed -n '/^== Summary/,$p' logs/run.txt | grep -v "Review the changes"
+            echo
+            git diff --cached --stat
+            echo '```'
+            echo
+            echo "Review before merging: CPU names are the ids of the Dataset API, columns are mapped by their header name."
+          } > "$RUNNER_TEMP/pull-request.md"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git commit -q -m "Update datasets ($SCRAPERS)" -m "Scraped by $RUN_URL"
+          git push origin "$BRANCH"
+
+          if ! gh pr create --base "$GITHUB_REF_NAME" --head "$BRANCH" \
+              --title "Update datasets ($SCRAPERS)" --body-file "$RUNNER_TEMP/pull-request.md"; then
+            echo "::error::Branch $BRANCH was pushed, but the pull request could not be created. Allow GitHub Actions to create pull requests (Settings > Actions > General) or open it manually: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH"
+            exit 1
+          fi
+
+      - name: Fail if a Scraper failed
+        if: steps.scrape.outputs.status == '2'
+        run: |
+          echo "::error::At least one scraper failed, was incomplete or empty. Its dataset is unchanged (see the job summary and logs)."
+          exit 1
