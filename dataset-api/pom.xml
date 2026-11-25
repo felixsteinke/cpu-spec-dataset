@@ -14,7 +14,7 @@
     <artifactId>dataset-api</artifactId>
     <name>dataset-api</name>
     <description>dataset-api</description>
-    <version>2.1</version>
+    <version>3.0</version>
 
     <properties>
         <java.version>25</java.version>

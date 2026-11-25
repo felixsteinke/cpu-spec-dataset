@@ -6,7 +6,7 @@
     <parent>
         <groupId>cpu.spec</groupId>
         <artifactId>cpu-spec-dataset</artifactId>
-        <version>2.1</version>
+        <version>3.0</version>
     </parent>
 
     <artifactId>web-scraper-library</artifactId>
