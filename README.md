@@ -118,6 +118,9 @@ cd dataset-api
 mvn test -Dtest="CsvMapperTest,*DatasetTest"
 ```
 
+> __Previous datasets:__ the datasets are only kept in their latest version, older versions are in the git history
+> (e.g. CPUs that were removed from the manufacturer websites).
+
 ### Recreate all Datasets
 
 Requires __JDK 25__, __Maven__ and __Google Chrome__ (benchmark & cpu-world scraper, the driver is resolved
