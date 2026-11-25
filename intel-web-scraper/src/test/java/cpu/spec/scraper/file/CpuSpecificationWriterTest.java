@@ -1,37 +1,40 @@
 package cpu.spec.scraper.file;
 
 import cpu.spec.scraper.CpuSpecificationModel;
-import cpu.spec.scraper.exception.ElementNotFoundException;
-import cpu.spec.scraper.parser.CpuSpecificationParser;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CpuSpecificationWriterTest {
 
     @Test
-    void testWriteCsvFile() throws IOException, ElementNotFoundException {
-        System.out.println("Execution directory: " + System.getProperty("user.dir"));
+    void testWriteCsvFile(@TempDir Path dir) throws IOException {
+        CpuSpecificationModel spec = new CpuSpecificationModel();
+        spec.id = "201900";
+        spec.cpuName = "Intel® Pentium® Gold G6405T Processor";
+        spec.sourceUrl = "https://intel.com/content/www/us/en/products/sku/201900/x/specifications.html";
+        spec.dataValues.put("Total Cores", "2");
+        spec.dataValues.put("Launch Date", "Q1'21");
 
-        File targetDir = new File(Paths.get(System.getProperty("user.dir")).getParent().toString() + "/dataset/");
-        assertTrue(targetDir.exists(), "directory exists '" + targetDir.getAbsolutePath() + "' exists");
+        Path file = dir.resolve("intel-cpus.csv");
+        CpuSpecificationWriter.writeCsvFile(List.of(spec), file.toString());
 
-        CpuSpecificationModel spec = CpuSpecificationParser.extractSpecification("https://ark.intel.com/content/www/us/en/ark/products/201900/intel-pentium-gold-g6405t-processor-4m-cache-3-50-ghz.html");
-        CpuSpecificationWriter.writeCsvFile(List.of(spec), "../dataset/test.csv");
-
-        File outputFile = new File(Paths.get(System.getProperty("user.dir")).getParent().toString() + "/dataset/test.csv");
-        assertTrue(outputFile.exists(), "file exists '" + outputFile.getAbsolutePath() + "' exists");
+        assertEquals(List.of(
+                "CpuId,\"CpuName\",Launch Date,Total Cores,\"SourceUrl\"",
+                "201900,\"Intel® Pentium® Gold G6405T Processor\",Q1'21,2,\"https://intel.com/content/www/us/en/products/sku/201900/x/specifications.html\""),
+                Files.readAllLines(file));
     }
 
     @Test
-    void testInvalidPath() {
+    void testInvalidPath(@TempDir Path dir) {
         CpuSpecificationModel spec = new CpuSpecificationModel();
-        assertThrows(IOException.class, () -> CpuSpecificationWriter.writeCsvFile(List.of(spec), "../dataset/"));
+        assertThrows(IOException.class, () -> CpuSpecificationWriter.writeCsvFile(List.of(spec), dir.toString()));
     }
 }
