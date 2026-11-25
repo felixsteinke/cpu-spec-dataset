@@ -1,4 +1,7 @@
 dataset/test.csv
+# scraper outputs that never replace a dataset (incomplete run / smoke test)
+dataset/*.incomplete.csv
+dataset/*.limited.csv
 dataset-api/src/main/resources/dataset
 
 **/HELP.md
