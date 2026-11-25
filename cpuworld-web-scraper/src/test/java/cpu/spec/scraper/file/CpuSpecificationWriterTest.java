@@ -1,36 +1,40 @@
 package cpu.spec.scraper.file;
 
 import cpu.spec.scraper.CpuSpecificationModel;
-import cpu.spec.scraper.parser.CpuSpecificationParser;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CpuSpecificationWriterTest {
 
     @Test
-    void testWriteCsvFile() throws Exception {
-        System.out.println("Execution directory: " + System.getProperty("user.dir"));
+    void testWriteCsvFile(@TempDir Path dir) throws IOException {
+        CpuSpecificationModel spec = new CpuSpecificationModel();
+        spec.id = "Intel-Xeon%208272CL";
+        spec.cpuName = "Intel Xeon Platinum 8272CL";
+        spec.sourceUrl = "https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html";
+        spec.dataValues.put("The number of CPU cores", "26");
+        spec.dataValues.put("Socket", "Socket 3647, LGA3647-0");
 
-        File targetDir = new File(Paths.get(System.getProperty("user.dir")).getParent().toString() + "/dataset/");
-        assertTrue(targetDir.exists(), "directory exists '" + targetDir.getAbsolutePath() + "' exists");
+        Path file = dir.resolve("cpuworld-cpus.csv");
+        CpuSpecificationWriter.writeCsvFile(List.of(spec), file.toString());
 
-        CpuSpecificationModel spec = CpuSpecificationParser.extractSpecification("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8272CL.html");
-        CpuSpecificationWriter.writeCsvFile(List.of(spec), "../dataset/test.csv");
-
-        File outputFile = new File(Paths.get(System.getProperty("user.dir")).getParent().toString() + "/dataset/test.csv");
-        assertTrue(outputFile.exists(), "file exists '" + outputFile.getAbsolutePath() + "' exists");
+        assertEquals(List.of(
+                "CpuId,\"CpuName\",Socket,The number of CPU cores,\"SourceUrl\"",
+                "Intel-Xeon%208272CL,\"Intel Xeon Platinum 8272CL\",Socket 3647. LGA3647-0,26,\"https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%208272CL.html\""),
+                Files.readAllLines(file));
     }
 
     @Test
-    void testInvalidPath() {
+    void testInvalidPath(@TempDir Path dir) {
         CpuSpecificationModel spec = new CpuSpecificationModel();
-        assertThrows(IOException.class, () -> CpuSpecificationWriter.writeCsvFile(List.of(spec), "../dataset/"));
+        assertThrows(IOException.class, () -> CpuSpecificationWriter.writeCsvFile(List.of(spec), dir.toString()));
     }
 }

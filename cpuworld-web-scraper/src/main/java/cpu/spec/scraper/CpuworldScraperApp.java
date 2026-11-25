@@ -3,6 +3,7 @@ package cpu.spec.scraper;
 import cpu.spec.scraper.exception.DirectoryNotFoundException;
 import cpu.spec.scraper.factory.LoggerFactory;
 import cpu.spec.scraper.file.CpuSpecificationWriter;
+import cpu.spec.scraper.file.DatasetOutput;
 import cpu.spec.scraper.parser.CpuSeriesParser;
 import cpu.spec.scraper.parser.CpuSpecificationParser;
 import cpu.spec.scraper.utils.FileUtils;
@@ -10,6 +11,7 @@ import cpu.spec.scraper.utils.LogUtils;
 import cpu.spec.scraper.utils.TimeUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,9 +26,13 @@ public class CpuworldScraperApp {
         String outputFile = "cpuworld-cpus.csv";
 
         List<CpuSpecificationModel> specifications = extractXeonPlatinumAndXeonGoldSpecifications();
+        if (specifications.isEmpty()) {
+            throw new IllegalStateException("No CPU Specifications extracted (blocked requests or changed website structure).");
+        }
 
-        CpuSpecificationWriter.writeCsvFile(specifications, outputDir + outputFile);
-        LOGGER.info("Finished Cpu World Scraper. Output at: " + outputDir + outputFile);
+        Path output = DatasetOutput.resolve(outputDir, outputFile, specifications.size());
+        CpuSpecificationWriter.writeCsvFile(specifications, output.toString());
+        LOGGER.info("Finished Cpu World Scraper. Output at: " + output);
     }
 
     private static List<CpuSpecificationModel> extractXeonPlatinumAndXeonGoldSpecifications() {
@@ -36,7 +42,7 @@ public class CpuworldScraperApp {
         LOGGER.info("Given " + familyLinks.size() + " Family Links.");
 
         List<String> specificationHrefs = extractNavigationLinks(familyLinks);
-        List<String> specificationLinks = specificationHrefs.stream().map(href -> HOST_URL + href).toList();
+        List<String> specificationLinks = ScraperConfig.limit(specificationHrefs.stream().map(href -> HOST_URL + href).toList());
         LOGGER.info("Extracted " + specificationLinks.size() + " Specification Links.");
 
         List<CpuSpecificationModel> specifications = extractSpecifications(specificationLinks);
