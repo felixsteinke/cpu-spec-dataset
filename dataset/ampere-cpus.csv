@@ -1,13 +1,26 @@
-CpuName,ClockSpeed,Cores,TDP,SourceUrl
-M128-30,3.0,128,183,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-M128-28,2.8,128,154,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-M128-26,2.6,128,133,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-M96-30,3.0,96,157,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-M96-28,2.8,96,132,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q80-30,3.0,80,161,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q80-28,2.8,80,124,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q80-26,2.6,80,113,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q64-30,3.0,64,124,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q64-26,2.6,64,87,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q64-22,2.2,64,69,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
-Q32-17,1.7,32,40,https://amperecomputing.com/briefs/ampere-altra-family-product-brief
+"CpuName","ClockSpeed","Cores","TDP","SourceUrl","Family"
+"M128-30","3.0","128","183","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"M128-28","2.8","128","154","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"M128-26","2.6","128","133","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"M96-30","3.0","96","157","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"M96-28","2.8","96","132","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q80-30","3.0","80","161","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q80-28","2.8","80","124","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q80-26","2.6","80","113","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q64-30","3.0","64","124","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q64-26","2.6","64","87","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q64-22","2.2","64","69","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"Q32-17","1.7","32","40","https://amperecomputing.com/briefs/ampere-altra-family-product-brief","Ampere Altra"
+"AmpereOne® A192-32X","3.2","192","283","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A192-26X","2.6","192","211","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A160-28X","2.8","160","214","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A144-27X","2.7","144","202","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A144-24X","2.4","144","194","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A128-34X","3.4","128","275","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A96-36X","3.6","96","273","https://amperecomputing.com/briefs/ampereone-family-product-brief","AmpereOne"
+"AmpereOne® A192-32M","3.2","192","348","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
+"AmpereOne® A192-26M","2.6","192","278","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
+"AmpereOne® A160-28M","2.8","160","262","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
+"AmpereOne® A144-33M","3.3","144","334","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
+"AmpereOne® A144-26M","2.6","144","239","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
+"AmpereOne® A96-36M","3.6","96","331","https://amperecomputing.com/briefs/ampereone-m-product-brief","AmpereOne M"
