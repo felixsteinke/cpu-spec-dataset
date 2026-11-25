@@ -3,6 +3,7 @@ name: Scraper Smoke Test
 # Manually checks whether the scrapers can still read their web pages: each scraper runs with -Dscraper.limit=1
 # (only the first page of each level, e.g. 1 Intel series and 1 specification page) and has to return at least
 # one CPU. The datasets are not changed, the logs and outputs (dataset/*.limited.csv) are uploaded as artifact.
+# Websites may block requests from GitHub's runners. Then run scripts/scrape-all.sh on another machine instead.
 on:
   workflow_dispatch:
     inputs:
