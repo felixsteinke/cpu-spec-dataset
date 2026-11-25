@@ -8,7 +8,8 @@ import java.util.logging.Logger;
 /**
  * Runtime options for all scrapers, passed as system properties (e.g. java -Dscraper.limit=5 -jar executable.jar).
  * <ul>
- *     <li>{@code scraper.limit}: only process the first N detail pages (smoke test, output to *.limited.csv)</li>
+ *     <li>{@code scraper.limit}: only process the first N pages of each level, e.g. series and specification pages
+ *     (smoke test, output to *.limited.csv)</li>
  *     <li>{@code scraper.delay}: milliseconds to wait between detail page requests</li>
  *     <li>{@code scraper.force}: overwrite the dataset even if the new run has much fewer records</li>
  * </ul>
@@ -24,7 +25,7 @@ public abstract class ScraperConfig {
     }
 
     /**
-     * @param items all items (e.g. detail page links)
+     * @param items all items (e.g. series or specification page links)
      * @return the first N items if a limit is configured, otherwise all items
      */
     public static <T> List<T> limit(List<T> items) {
