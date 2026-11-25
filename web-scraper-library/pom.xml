@@ -28,6 +28,10 @@
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
         </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
