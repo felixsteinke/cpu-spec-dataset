@@ -1,11 +1,13 @@
 # CPU Specification Dataset
 
-Dataset for CPU specifications from Intel and AMD.
+Dataset for CPU specifications from Intel, AMD and Ampere, extended by CPU benchmark and CPU-World data.
 
 ## Table of Content
 
 * [Raw Datasets](dataset)
 * [Dataset API](dataset-api/src/main/java/cpu/spec/dataset/api)
+* [AMD Web Scraper](amd-web-scraper/src/main/java/cpu/spec/scraper)
+* [Ampere Web Scraper](ampere-web-scraper/src/main/java/cpu/spec/scraper)
 * [Intel Web Scraper](intel-web-scraper/src/main/java/cpu/spec/scraper)
 * [Benchmark Web Scraper](benchmark-web-scraper/src/main/java/cpu/spec/scraper)
 * [Cpuworld Web Scraper](cpuworld-web-scraper/src/main/java/cpu/spec/scraper)
@@ -116,13 +118,49 @@ cd dataset-api
 mvn test -Dtest="CsvMapperTest,*DatasetTest"
 ```
 
+### Recreate all Datasets
+
+Requires __JDK 25__, __Maven__ and __Google Chrome__ (benchmark & cpu-world scraper, the driver is resolved
+automatically by Selenium) and runs on Linux, macOS and Windows (Git Bash):
+
+```shell
+./scripts/scrape-all.sh                 # all scrapers: amd ampere benchmark intel cpuworld
+./scripts/scrape-all.sh amd benchmark   # selected scrapers
+```
+
+The script builds the project, runs the scrapers (logs in `logs/`), validates the datasets with the Dataset API
+tests and prints a summary. Review the result with `git diff --stat dataset/` before committing it.
+
+| JVM Option (`JAVA_OPTS="..."`)              | Description                                                                |
+|---------------------------------------------|----------------------------------------------------------------------------|
+| `-Dscraper.limit=5`                         | Smoke test with 5 detail pages, written to `dataset/*.limited.csv`         |
+| `-Dscraper.delay=500`                       | Wait 500 ms between detail page requests (Intel)                           |
+| `-Dscraper.force=true`                      | Replace a dataset even if the new run has much fewer records               |
+| `-Djavax.net.ssl.trustStoreType=Windows-ROOT` | Use the Windows certificate store (TLS-intercepting proxy, `PKIX` error) |
+
+Safeguards:
+
+* __Incomplete runs never replace a dataset:__ if a scraper extracts less than 80 % of the existing records
+  (e.g. blocked requests), it writes `dataset/*.incomplete.csv` instead (ignored by git).
+* __Stable API:__ the CPU name is the id of the Dataset API. The scrapers keep the names, columns and value formats of
+  the previous dataset version, new columns are appended (benchmark: CPUs keep their previous name and values the
+  source does not provide anymore).
+* The Intel scraper stops after 25 failed specification pages in a row (requests blocked).
+
 ### [AMD Dataset](dataset/amd-cpus.csv)
 
-Manually __Export Data__ as __CSV/Excel__
-from [https://www.amd.com/en/products/specifications/processors.html](https://www.amd.com/en/products/specifications/processors.html)
+Extracted from the specification tables (client and server processors) of
+[https://www.amd.com/en/products/specifications/processors.html](https://www.amd.com/en/products/specifications/processors.html)
+with the responsible __Web Scraper__. The pages embed the same data the __Export__ button of the table uses (1 request
+per page, a few seconds).
+
+```shell
+cd amd-web-scraper
+java -jar ./target/executable.jar
+```
 
 <details>
-  <summary>Website Screenshot</summary>
+  <summary>Manual Export (fallback)</summary>
 
 ![amd-csv-export](.docs/amd-csv-export.png)
 
@@ -130,8 +168,10 @@ from [https://www.amd.com/en/products/specifications/processors.html](https://ww
 
 ### [Ampere Dataset](dataset/ampere-cpus.csv)
 
-Extracted from
-[https://amperecomputing.com/briefs/ampere-altra-family-product-brief](https://amperecomputing.com/briefs/ampere-altra-family-product-brief)
+Extracted from the SKU tables of the product briefs
+([Ampere Altra](https://amperecomputing.com/briefs/ampere-altra-family-product-brief),
+[AmpereOne](https://amperecomputing.com/briefs/ampereone-family-product-brief),
+[AmpereOne M](https://amperecomputing.com/briefs/ampereone-m-product-brief))
 with the responsible __Web Scraper__.
 
 ```shell
@@ -143,7 +183,7 @@ java -jar ./target/executable.jar
 
 Extracted from
 [https://www.intel.com/content/www/us/en/ark.html](https://www.intel.com/content/www/us/en/ark.html)
-with the responsible __Web Scraper__.
+with the responsible __Web Scraper__ (about 3,000 specification pages, run a smoke test with `-Dscraper.limit=5` first).
 
 ```shell
 cd intel-web-scraper
@@ -152,8 +192,8 @@ java -jar ./target/executable.jar
 
 ### [CPU Benchmark Dataset](dataset/benchmark-cpus.csv)
 
-Extracted from [https://www.cpubenchmark.net/cpu_list.php](https://www.cpubenchmark.net/cpu_list.php)
-with the responsible __Web Scraper__.
+Extracted from the data table of [https://www.cpubenchmark.net/CPU_mega_page.html](https://www.cpubenchmark.net/CPU_mega_page.html)
+(all CPUs with specifications and benchmark scores, 1 page load) with the responsible __Web Scraper__ (Chrome).
 
 ```shell
 cd benchmark-web-scraper
@@ -163,7 +203,7 @@ java -jar ./target/executable.jar
 ### [CPU World Dataset](dataset/cpuworld-cpus.csv)
 
 Extracted from [https://www.cpu-world.com/CPUs/CPU.html](https://www.cpu-world.com/CPUs/CPU.html)
-with the responsible __Web Scraper__.
+(Intel Xeon Platinum & Gold, waits 3 - 10 s between pages) with the responsible __Web Scraper__ (Chrome).
 
 ```shell
 cd cpuworld-web-scraper
