@@ -42,8 +42,7 @@ public class AmdScraperApp {
         List<List<String>> rows = processors.values().stream()
                 .map(row -> columns.stream().map(column -> row.getOrDefault(column, "")).toList())
                 .toList();
-        Path output = DatasetOutput.resolve(outputDir, outputFile, rows.size());
-        CsvWriter.write(output, columns, rows);
+        Path output = DatasetOutput.write(outputDir, outputFile, file -> CsvWriter.write(file, columns, rows));
         LOGGER.info("Finished AMD Scraper with " + rows.size() + " CPU Specifications. Output at: " + output);
     }
 }

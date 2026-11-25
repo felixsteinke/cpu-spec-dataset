@@ -2,8 +2,10 @@ name: Dataset Update
 
 # Manually runs the scrapers and opens a pull request with the changed datasets from the branch "dataset-update".
 # - Stops before scraping if the branch already exists (merge or close the open update and delete the branch first).
-# - Datasets of failed or incomplete scrapers stay unchanged. The pull request contains the other datasets and the
-#   run fails afterwards, so the failure is visible. Nothing is committed if the dataset validation fails.
+# - The scraped records are merged into the datasets (CPUs that were not found keep their row), with "force" they
+#   replace the datasets.
+# - Datasets of failed scrapers stay unchanged. The pull request contains the other datasets and the run fails
+#   afterwards, so the failure is visible. Nothing is committed if the dataset validation fails.
 # - After merging, the branch is deleted (Settings > General > "Automatically delete head branches"), so the next
 #   update can run.
 # - Websites may block requests from GitHub's runners (see the Scraper Smoke Test). Then run scripts/scrape-all.sh on
@@ -17,7 +19,7 @@ on:
         type: string
         default: amd ampere benchmark intel
       force:
-        description: Replace datasets even if a run has much fewer records (scraper.force)
+        description: Replace the datasets instead of merging the scraped records into them (scraper.force)
         type: boolean
         default: false
 
@@ -84,9 +86,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: dataset-update
-          path: |
-            logs/
-            dataset/*.incomplete.csv
+          path: logs/
           retention-days: 14
 
       - name: Commit and open Pull Request
@@ -127,5 +127,5 @@ jobs:
       - name: Fail if a Scraper failed
         if: steps.scrape.outputs.status == '2'
         run: |
-          echo "::error::At least one scraper failed, was incomplete or empty. Its dataset is unchanged (see the job summary and logs)."
+          echo "::error::At least one scraper failed or was empty. Its dataset is unchanged (see the job summary and logs)."
           exit 1

@@ -69,7 +69,8 @@ public abstract class CsvReader {
                 } else {
                     field.append(c);
                 }
-            } else if (c == '"') {
+            } else if (c == '"' && field.toString().isBlank()) {
+                // quotes only open a quoted field at its start, otherwise they are part of the value (e.g. 2.99" x 2.22")
                 quoted = true;
             } else if (c == ',') {
                 fields.add(field.toString().trim());

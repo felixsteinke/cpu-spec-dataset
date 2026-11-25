@@ -25,8 +25,8 @@ public class BenchmarkScraperApp {
         List<CpuSpecificationModel> specifications = MegaPageParser.extractSpecifications(previousRecords);
         LOGGER.info("Extracted " + specifications.size() + " CPU Specifications.");
 
-        Path output = DatasetOutput.resolve(outputDir, outputFile, specifications.size());
-        CsvWriter.write(output, CpuSpecificationModel.HEADER, specifications.stream().map(CpuSpecificationModel::toRow).toList());
+        Path output = DatasetOutput.write(outputDir, outputFile, file -> CsvWriter.write(file, CpuSpecificationModel.HEADER,
+                specifications.stream().map(CpuSpecificationModel::toRow).toList()));
         LOGGER.info("Finished Cpu Benchmark Scraper. Output at: " + output);
     }
 }

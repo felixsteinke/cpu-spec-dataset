@@ -39,8 +39,7 @@ public class AmpereScraperApp {
         List<List<String>> rows = specifications.stream()
                 .map(s -> List.of(s.cpuName(), s.clockSpeed(), s.cores(), s.tdp(), s.sourceUrl(), s.family()))
                 .toList();
-        Path output = DatasetOutput.resolve(outputDir, outputFile, rows.size());
-        CsvWriter.write(output, HEADER, rows);
+        Path output = DatasetOutput.write(outputDir, outputFile, file -> CsvWriter.write(file, HEADER, rows));
         LOGGER.info("Finished Ampere Scraper with " + rows.size() + " CPU Specifications. Output at: " + output);
     }
 }

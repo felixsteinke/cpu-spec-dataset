@@ -10,36 +10,67 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
- * Protects existing datasets from being overwritten by incomplete scraper runs (e.g. blocked requests).
+ * Writes the records of a scraper run into its dataset:
+ * <ul>
+ *     <li>default: the records are merged into the dataset, CPUs the run did not find keep their row (see {@link DatasetMerge})</li>
+ *     <li>{@code -Dscraper.force=true}: the records replace the dataset</li>
+ *     <li>{@code -Dscraper.limit} (smoke test): the records are written to *.limited.csv, the dataset is unchanged</li>
+ * </ul>
  */
 public abstract class DatasetOutput {
     /**
-     * minimum share of the existing row count a new run must reach to replace the dataset
+     * share of the dataset rows a run should update, otherwise the merge is logged as warning (e.g. blocked requests)
      */
     public static final double MIN_ROW_RATIO = 0.8;
     private static final Logger LOGGER = LoggerFactory.getLogger();
 
     /**
+     * Writes the records of a scraper run in its own csv format, e.g. {@code file -> CsvWriter.write(file, header, rows)}.
+     */
+    @FunctionalInterface
+    public interface RecordWriter {
+        void write(Path file) throws IOException;
+    }
+
+    /**
      * @param outputDir directory of the dataset (e.g. "../dataset/")
      * @param fileName  dataset file name (e.g. "amd-cpus.csv")
-     * @param newRows   number of extracted records
-     * @return the dataset path, or "*.incomplete.csv" if the new run has less than {@link #MIN_ROW_RATIO} of the
-     * existing rows (unless forced with -Dscraper.force=true or a smoke test limit is active)
-     * @throws IOException if the existing dataset cannot be read
+     * @param writer    writes the records of the run to the given file
+     * @return the dataset path, or "*.limited.csv" for a smoke test
+     * @throws IOException           if a file cannot be read or written
+     * @throws IllegalStateException if the run has no records (the dataset is unchanged)
      */
-    public static Path resolve(String outputDir, String fileName, int newRows) throws IOException {
+    public static Path write(String outputDir, String fileName, RecordWriter writer) throws IOException {
         Path target = Path.of(outputDir, fileName);
         if (ScraperConfig.isLimited()) {
             Path smokeTest = Path.of(outputDir, fileName.replace(".csv", ".limited.csv"));
             LOGGER.warning("Smoke test limit active: writing to " + smokeTest + " instead of the dataset.");
+            writer.write(smokeTest);
             return smokeTest;
         }
-        long existingRows = countRows(target);
-        if (newRows < existingRows * MIN_ROW_RATIO && !ScraperConfig.isForced()) {
-            Path incomplete = Path.of(outputDir, fileName.replace(".csv", ".incomplete.csv"));
-            LOGGER.warning(String.format("Only %d records extracted, the existing dataset has %d. Keeping %s and writing to %s "
-                    + "(use -Dscraper.force=true to overwrite anyway).", newRows, existingRows, target, incomplete));
-            return incomplete;
+        Path records = Files.createTempFile(fileName.replace(".csv", "-"), ".csv");
+        try {
+            writer.write(records);
+            if (countRows(records) == 0) {
+                throw new IllegalStateException("No records extracted, " + target + " is unchanged.");
+            }
+            long previousRows = countRows(target);
+            if (ScraperConfig.isForced()) {
+                DatasetMerge.Result result = DatasetMerge.replace(records, target);
+                LOGGER.info("Replaced " + target + " (scraper.force, " + previousRows + " rows before): " + result);
+            } else {
+                DatasetMerge.Result result = DatasetMerge.merge(records, target);
+                String message = "Merged " + (result.updated() + result.added()) + " records into " + target + ": " + result;
+                if (result.updated() < previousRows * MIN_ROW_RATIO) {
+                    LOGGER.warning(String.format("%s. Only %d of %d CPUs of the dataset were found again (blocked requests or "
+                            + "removed from the website), the others are kept (use -Dscraper.force=true to replace the dataset).",
+                            message, result.updated(), previousRows));
+                } else {
+                    LOGGER.info(message);
+                }
+            }
+        } finally {
+            Files.deleteIfExists(records);
         }
         return target;
     }

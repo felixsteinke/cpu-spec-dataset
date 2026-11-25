@@ -7,10 +7,10 @@
 # Options: JAVA_OPTS="..." ./scripts/scrape-all.sh
 #          -Dscraper.limit=5     smoke test: only 5 pages per level, output to dataset/*.limited.csv
 #          -Dscraper.delay=500   wait 500 ms between detail page requests (intel)
-#          -Dscraper.force=true  replace a dataset even if the new run has much fewer records
+#          -Dscraper.force=true  replace the datasets instead of merging the scraped records into them
 # Exit:    0 all scrapers OK and datasets valid
 #          1 unknown scraper, build or dataset validation failed (datasets must not be used)
-#          2 at least one scraper failed, was incomplete or empty (the other datasets are valid)
+#          2 at least one scraper failed or was empty (its dataset is unchanged, the other datasets are valid)
 #
 # Logs are written to logs/<scraper>-web-scraper.log and logs/dataset-api-validation.log.
 set -u
@@ -46,9 +46,9 @@ RESULTS=()  # "scraper|result" (no associative arrays: macOS ships bash 3.2)
 for scraper in "${SCRAPERS[@]}"; do
   module="$scraper-web-scraper"
   log="logs/$module.log"
-  dataset="dataset/$scraper-cpus"  # each scraper writes dataset/<scraper>-cpus[.limited|.incomplete].csv
+  dataset="dataset/$scraper-cpus"  # each scraper merges into dataset/<scraper>-cpus.csv (smoke test: *.limited.csv)
   echo "== $module (log: $log)"
-  rm -f "$dataset.limited.csv" "$dataset.incomplete.csv"  # outputs of previous runs
+  rm -f "$dataset.limited.csv"  # output of a previous smoke test
   start=$(date +%s)
   # shellcheck disable=SC2086
   (cd "$module" && java $JAVA_OPTS -jar target/executable.jar) > "$log" 2>&1
@@ -56,19 +56,19 @@ for scraper in "${SCRAPERS[@]}"; do
   elapsed="$(( $(date +%s) - start ))s"
   if [ $exit_code -ne 0 ]; then
     RESULTS+=("$scraper|FAILED ($elapsed)")
-  elif [ -e "$dataset.incomplete.csv" ]; then
-    RESULTS+=("$scraper|INCOMPLETE ($(rows "$dataset.incomplete.csv") rows, $elapsed)")
   else
     output="$dataset.csv"
     [ -e "$dataset.limited.csv" ] && output="$dataset.limited.csv"
     count=$(rows "$output")
+    # rows of the merge, e.g. "2200 updated, 68 added, 643 kept" (kept: cpus the run did not find)
+    merged=$(grep -h -o -E "[0-9]+ updated, [0-9]+ added, [0-9]+ kept" "$log" | tail -n 1)
     if [ "$count" -eq 0 ]; then
       RESULTS+=("$scraper|EMPTY (0 rows, $elapsed)")
     else
-      RESULTS+=("$scraper|OK ($count rows, $elapsed)")
+      RESULTS+=("$scraper|OK ($count rows${merged:+: $merged}, $elapsed)")
     fi
   fi
-  grep -h -E "Extracted [0-9]+|Output at|SEVERE|incomplete|Smoke test|Exception in thread" "$log" \
+  grep -h -E "Extracted [0-9]+|Output at|SEVERE|Merged|Replaced|Smoke test|Exception in thread" "$log" \
     | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-220 | tail -n 4
 done
 
@@ -92,9 +92,8 @@ done
 printf "  %-10s %s\n" "validation" "$VALIDATION"
 [ "$VALIDATION" = "OK" ] || STATUS=1
 for scraper in "${SCRAPERS[@]}"; do
-  for file in "dataset/$scraper-cpus.incomplete.csv" "dataset/$scraper-cpus.limited.csv"; do
-    [ -e "$file" ] && echo "  note: $file was written instead of the dataset (see the scraper log)"
-  done
+  file="dataset/$scraper-cpus.limited.csv"
+  [ -e "$file" ] && echo "  note: $file was written instead of the dataset (smoke test)"
 done
 echo "  Review the changes with: git diff --stat dataset/"
 exit $STATUS
