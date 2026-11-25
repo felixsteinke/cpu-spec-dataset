@@ -7,7 +7,6 @@
 #          -Dscraper.limit=5     smoke test: only 5 pages per level, output to dataset/*.limited.csv
 #          -Dscraper.delay=500   wait 500 ms between detail page requests (intel)
 #          -Dscraper.force=true  replace a dataset even if the new run has much fewer records
-#          -Djavax.net.ssl.trustStoreType=Windows-ROOT   behind a TLS-intercepting proxy on Windows
 # Exit:    0 all scrapers OK and datasets valid
 #          1 unknown scraper, build or dataset validation failed (datasets must not be used)
 #          2 at least one scraper failed, was incomplete or empty (the other datasets are valid)

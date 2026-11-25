@@ -132,12 +132,11 @@ The script builds the project, runs the scrapers (logs in `logs/`), validates th
 tests and prints a summary. It exits with `1` if the build or the validation failed and with `2` if a scraper failed
 (the other datasets are valid). Review the result with `git diff --stat dataset/` before committing it.
 
-| JVM Option (`JAVA_OPTS="..."`)                | Description                                                                     |
-|-----------------------------------------------|---------------------------------------------------------------------------------|
-| `-Dscraper.limit=5`                           | Smoke test with the first 5 pages per level, written to `dataset/*.limited.csv` |
-| `-Dscraper.delay=500`                         | Wait 500 ms between detail page requests (Intel)                                |
-| `-Dscraper.force=true`                        | Replace a dataset even if the new run has much fewer records                    |
-| `-Djavax.net.ssl.trustStoreType=Windows-ROOT` | Use the Windows certificate store (TLS-intercepting proxy, `PKIX` error)        |
+| JVM Option (`JAVA_OPTS="..."`) | Description                                                                     |
+|--------------------------------|---------------------------------------------------------------------------------|
+| `-Dscraper.limit=5`            | Smoke test with the first 5 pages per level, written to `dataset/*.limited.csv` |
+| `-Dscraper.delay=500`          | Wait 500 ms between detail page requests (Intel)                                |
+| `-Dscraper.force=true`         | Replace a dataset even if the new run has much fewer records                    |
 
 Safeguards:
 
