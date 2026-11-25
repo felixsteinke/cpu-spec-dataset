@@ -1,0 +1,132 @@
+<!doctype html>
+<!--
+  Source of the GitHub social preview image (.docs/social-preview.png, 1280x640).
+  Render with headless Chrome:
+  chrome --headless=new --hide-scrollbars --force-device-scale-factor=1 --window-size=1280,640
+         --screenshot=.docs/social-preview.png .docs/social-preview.html
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cpu-spec-dataset social preview</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1280px; height: 640px; overflow: hidden;
+    background: #0b1120;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #e6edf3;
+  }
+  .canvas {
+    position: relative; width: 1280px; height: 640px;
+    background:
+      radial-gradient(circle at 1010px 320px, rgba(34, 211, 238, .20), transparent 380px),
+      linear-gradient(rgba(148, 163, 184, .055) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(148, 163, 184, .055) 1px, transparent 1px) 0 0 / 40px 40px,
+      #0b1120;
+  }
+  .text { position: absolute; left: 80px; top: 128px; width: 700px; }
+  .owner {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 24px; color: #7d8da6;
+  }
+  h1 {
+    margin: 4px 0 0; font-size: 86px; font-weight: 700;
+    letter-spacing: -2px; line-height: 1.05; color: #f8fafc;
+  }
+  h1 span { color: #22d3ee; }
+  .sub { margin-top: 22px; font-size: 30px; line-height: 1.38; color: #b6c2d4; }
+  .sub b { color: #e6edf3; font-weight: 600; }
+  .stats { display: flex; gap: 14px; margin-top: 42px; }
+  .stat {
+    flex: 1; padding: 14px 18px 16px;
+    border: 1px solid rgba(148, 163, 184, .22); border-radius: 12px;
+    background: rgba(15, 23, 42, .75);
+  }
+  .num { font-size: 36px; font-weight: 700; color: #f8fafc; line-height: 1.1; }
+  .lbl { font-size: 18px; color: #8b9bb4; margin-top: 4px; }
+  svg { position: absolute; left: 810px; top: 120px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="text">
+    <div class="owner">github.com/felixsteinke/</div>
+    <h1>cpu-spec-<span>dataset</span></h1>
+    <div class="sub">Open CPU specifications of <b>Intel</b>, <b>AMD</b> &amp; <b>Ampere</b> processors as CSV, REST API and Docker image.</div>
+    <div class="stats">
+      <div class="stat"><div class="num">3,000+</div><div class="lbl">Intel CPUs</div></div>
+      <div class="stat"><div class="num">980+</div><div class="lbl">AMD CPUs</div></div>
+      <div class="stat"><div class="num">6,800+</div><div class="lbl">Benchmarks</div></div>
+    </div>
+  </div>
+
+  <svg id="chip" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#1e293b"/>
+        <stop offset="1" stop-color="#0f172a"/>
+      </linearGradient>
+      <linearGradient id="pin" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#67e8f9"/>
+        <stop offset="1" stop-color="#0891b2"/>
+      </linearGradient>
+    </defs>
+    <g id="traces"></g>
+    <g id="pins"></g>
+    <rect x="62" y="62" width="276" height="276" rx="22" fill="url(#body)" stroke="#22d3ee" stroke-opacity=".55" stroke-width="2"/>
+    <circle cx="90" cy="90" r="6" fill="#22d3ee" fill-opacity=".7"/>
+    <rect x="112" y="112" width="176" height="176" rx="12" fill="#0b1120" stroke="#334155" stroke-width="2"/>
+    <g id="table"></g>
+  </svg>
+</div>
+
+<script>
+  const ns = "http://www.w3.org/2000/svg";
+  const el = (parent, name, attrs) => {
+    const e = document.createElementNS(ns, name);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    document.getElementById(parent).appendChild(e);
+  };
+
+  // Pins: 8 per side
+  const count = 8, start = 92, step = 31, len = 30, w = 12;
+  for (let i = 0; i < count; i++) {
+    const p = start + i * step;
+    el("pins", "rect", { x: 32, y: p, width: len, height: w, rx: 3, fill: "url(#pin)" });
+    el("pins", "rect", { x: 338, y: p, width: len, height: w, rx: 3, fill: "url(#pin)" });
+    el("pins", "rect", { x: p, y: 32, width: w, height: len, rx: 3, fill: "url(#pin)" });
+    el("pins", "rect", { x: p, y: 338, width: w, height: len, rx: 3, fill: "url(#pin)" });
+  }
+
+  // Circuit traces leaving some pins, ending in vias
+  const traces = [
+    ["M368 98 H388", 388, 98], ["M368 160 H380 V140 H390", 390, 140],
+    ["M368 253 H390", 390, 253], ["M368 315 H380 V334 H390", 390, 334],
+    ["M98 32 V12", 98, 12], ["M222 32 V22 H250 V10", 250, 10], ["M346 32 V16", 346, 16],
+    ["M160 368 V380 H132 V390", 132, 390], ["M284 368 V388", 284, 388],
+    ["M32 191 H16", 16, 191],
+  ];
+  for (const [d, vx, vy] of traces) {
+    el("traces", "path", { d, fill: "none", stroke: "#22d3ee", "stroke-opacity": .4, "stroke-width": 2 });
+    el("traces", "circle", { cx: vx, cy: vy, r: 4, fill: "#0b1120", stroke: "#22d3ee", "stroke-opacity": .6, "stroke-width": 2 });
+  }
+
+  // Mini CSV table on the die: header row + data rows
+  const cols = [44, 30, 36, 30], x0 = 128, y0 = 132, colGap = 8, rowH = 22;
+  for (let r = 0; r < 7; r++) {
+    let x = x0;
+    cols.forEach((cw, c) => {
+      const header = r === 0;
+      const width = header ? cw : cw * (0.55 + 0.45 * ((r * 7 + c * 3) % 5) / 4);
+      el("table", "rect", {
+        x, y: y0 + r * rowH, width, height: header ? 10 : 8, rx: 3,
+        fill: header ? "#22d3ee" : (c === 0 ? "#94a3b8" : "#475569"),
+        "fill-opacity": header ? .9 : .8,
+      });
+      x += cw + colGap;
+    });
+  }
+</script>
+</body>
+</html>
