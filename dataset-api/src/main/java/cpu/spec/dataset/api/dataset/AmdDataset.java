@@ -3,6 +3,7 @@ package cpu.spec.dataset.api.dataset;
 import cpu.spec.dataset.api.mapping.CsvColumnModification;
 import cpu.spec.dataset.api.mapping.CsvColumnNameMapping;
 
+import java.time.Year;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +27,7 @@ public class AmdDataset extends Dataset {
         mapping.maxFrequency = new String[]{"Max. Boost Clock"};
         mapping.tdp = new String[]{"Default TDP", "AMD Configurable TDP (cTDP)"};
         mapping.launchDate = new String[]{"Launch Date"};
-        mapping.sourceUrl = new String[]{};
+        mapping.sourceUrl = new String[]{"SourceUrl"};
         return mapping;
     }
 
@@ -66,25 +67,33 @@ public class AmdDataset extends Dataset {
         modification.maxFrequency = frequencyFunction;
         modification.tdp = (s -> {
             if (s == null) return null;
-            s = s.replaceAll("W", "").replaceAll("\\+", "");
-            if (s.contains("-")) {
-                s = s.split("-")[1];
+            // upper value of ranges and lists (e.g. "65W", "45-120W", "15/25W", "115 , 120W")
+            Matcher matcher = Pattern.compile("\\d+(\\.\\d+)?").matcher(s);
+            String last = null;
+            while (matcher.find()) {
+                last = matcher.group();
             }
-            if (s.contains("/")) {
-                s = s.split("/")[1];
-            }
-            return s;
+            return last;
         });
         modification.launchDate = (s -> {
             if (s == null) return null;
-            Matcher matcher = Pattern.compile("\\d{4}").matcher(s);
-            if (matcher.find()) {
-                return matcher.group();
-            } else {
-                return null;
+            // e.g. "10/19/2023", "Q3 2016", "Q12021" (4-digit year) or "9/16/25", "Q217", "2Q18" (2-digit year)
+            Matcher fullYear = Pattern.compile("(19|20)\\d{2}").matcher(s);
+            if (fullYear.find()) {
+                return fullYear.group();
             }
+            Matcher shortYear = Pattern.compile("(\\d{2})\\s*$").matcher(s.trim());
+            if (shortYear.find()) {
+                int year = Integer.parseInt(shortYear.group(1));
+                return Integer.toString(year <= Year.now().getValue() % 100 ? 2000 + year : 1900 + year);
+            }
+            return null;
         });
-        modification.sourceUrl = (s -> "https://www.amd.com/en/products/specifications/processors.html");
+        modification.sourceUrl = (s -> {
+            // product page, or the specification page if a processor has none
+            if (s == null || s.isBlank()) return "https://www.amd.com/en/products/specifications/processors.html";
+            return s;
+        });
         return modification;
     }
 }

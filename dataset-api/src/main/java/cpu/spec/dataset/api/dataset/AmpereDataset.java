@@ -15,7 +15,7 @@ public class AmpereDataset extends Dataset {
     public CsvColumnNameMapping getColumnNameMapping() {
         CsvColumnNameMapping mapping = new CsvColumnNameMapping();
         mapping.name = new String[]{"CpuName"};
-        mapping.productCollection = new String[]{};
+        mapping.productCollection = new String[]{"Family"};
         mapping.cores = new String[]{"Cores"};
         mapping.threads = new String[]{};
         mapping.baseFrequency = new String[]{"ClockSpeed"};
@@ -32,7 +32,12 @@ public class AmpereDataset extends Dataset {
     @Override
     public CsvColumnModification getColumnModifications() {
         CsvColumnModification modification = new CsvColumnModification();
-        modification.name = (s -> "Ampere Altra " + s);
+        // Altra briefs only list the model (e.g. "M128-30"), AmpereOne briefs the full name (e.g. "AmpereOne® A192-32X")
+        modification.name = (s -> {
+            if (s == null) return null;
+            return s.startsWith("Ampere") ? s : "Ampere Altra " + s;
+        });
+        modification.manufacturer = (s -> "ampere");
         modification.productCollection = null;
         modification.cores = null;
         modification.threads = null;
