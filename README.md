@@ -48,7 +48,7 @@ Endpoint is available at: `GET http://localhost:8080/api/cpu-dataset`
 | `spring.datasource.username`                 | `root`                                | Username and usually root          |
 | `spring.datasource.password`                 | `password`                            | Custom password                    |
 | `spring.jpa.hibernate.ddl-auto`              | `update` or `validate`                | Table schema update mode           |
-| `spring.jpa.defer-datasource-initialization` | `false` or `true`                     | Defer database update with dataset |
+| `spring.jpa.defer-datasource-initialization` | `false` or `true`                     | `true` skips the dataset import    |
 
 </details>
 
@@ -74,11 +74,19 @@ docker run -p 8080:80 --name dataset-api cpu-spec-dataset-api:local
 
 ### Container Configuration
 
-| Environment Key              | Example Value                                   | Description                  |
-|------------------------------|-------------------------------------------------|------------------------------|
-| `SPRING_DATASOURCE_URL`      | `jdbc:mysql://host.docker.internal:3306/cpu_db` | Full url to a MySQL database |
-| `SPRING_DATASOURCE_USERNAME` | `root`                                          | Username and usually root    |
-| `SPRING_DATASOURCE_PASSWORD` | `password`                                      | Custom password              |
+| Environment Key                              | Example Value                                   | Description                         |
+|----------------------------------------------|-------------------------------------------------|-------------------------------------|
+| `SPRING_DATASOURCE_URL`                      | `jdbc:mysql://host.docker.internal:3306/cpu_db` | Full url to a MySQL database        |
+| `SPRING_DATASOURCE_USERNAME`                 | `root`                                          | Username and usually root           |
+| `SPRING_DATASOURCE_PASSWORD`                 | `password`                                      | Custom password                     |
+| `SPRING_JPA_HIBERNATE_DDL_AUTO`              | `validate` (default) or `update`                | Table schema update mode            |
+| `SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION` | `false` (default) or `true`                     | `true` skips the dataset import     |
+
+> __Dataset import:__ by default every start imports all datasets of the image into the database (existing rows are
+> updated, new ones added, none deleted), which takes a few seconds before the data is complete. With
+> `SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION=true` the import is skipped and the API serves the database as it is,
+> e.g. for faster restarts of an already filled database. A new image version only provides its datasets through the
+> import, so do not skip it on the first start of a new version.
 
 > __Upgrading an existing database:__ the `prod` profile only validates the schema (`ddl-auto=validate`) and fails to
 > start with `missing column [...]` if the table was created by an older version (e.g. `v1.0` lacks the `*_index`
