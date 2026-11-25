@@ -3,6 +3,7 @@ package cpu.spec.scraper.parser;
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,6 +52,7 @@ class CpuSpecificationParserTest {
                 () -> CpuSpecificationParser.parseSpecification(Jsoup.parse("<div id=\"AB_B\"><h1>x</h1></div>"), URL));
     }
 
+    @Tag("live")
     @Test
     void testExtractSpecificationSample() throws Exception {
         CpuSpecificationModel actual = CpuSpecificationParser.extractSpecification("https://www.cpu-world.com/CPUs/Xeon/Intel-Xeon 8272CL.html");

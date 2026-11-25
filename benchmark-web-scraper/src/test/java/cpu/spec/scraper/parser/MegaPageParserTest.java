@@ -1,6 +1,7 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.CpuSpecificationModel;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -93,6 +94,7 @@ class MegaPageParserTest {
         assertEquals("Q1 2021", MegaPageParser.quarter("Q1 2021"));
     }
 
+    @Tag("live")
     @Test
     void extractSpecificationsLive() throws Exception {
         List<CpuSpecificationModel> specs = MegaPageParser.extractSpecifications();

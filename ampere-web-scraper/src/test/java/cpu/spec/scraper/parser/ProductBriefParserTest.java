@@ -3,6 +3,7 @@ package cpu.spec.scraper.parser;
 import cpu.spec.scraper.CpuSpecificationModel;
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ class ProductBriefParserTest {
                 () -> ProductBriefParser.parseSpecifications(Jsoup.parse("<table><tr><td>Features</td></tr></table>"), "AmpereOne", URL));
     }
 
+    @Tag("live")
     @Test
     void extractAllProductBriefsLive() throws IOException, ElementNotFoundException {
         assertTrue(ProductBriefParser.extractSpecifications("Ampere Altra", "https://amperecomputing.com/briefs/ampere-altra-family-product-brief").size() >= 10);
