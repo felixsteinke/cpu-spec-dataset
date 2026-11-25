@@ -2,6 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import cpu.spec.scraper.parser.SpecificationTableParser.Table;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -58,6 +59,7 @@ class SpecificationTableParserTest {
         assertEquals("1P / 2P", epyc.get("Socket Count"));
     }
 
+    @Tag("live")
     @Test
     void extractTableLive() throws IOException, ElementNotFoundException {
         Table table = SpecificationTableParser.extractTable("https://www.amd.com/en/products/specifications/processors.html");
@@ -65,6 +67,7 @@ class SpecificationTableParserTest {
         assertTrue(table.header().containsAll(List.of("Name", "# of CPU Cores", "# of Threads", "Base Clock", "Max. Boost Clock", "Default TDP", "Launch Date")));
     }
 
+    @Tag("live")
     @Test
     void invalidPage() {
         assertThrows(ElementNotFoundException.class, () -> SpecificationTableParser.extractTable("https://www.amd.com/en.html"));

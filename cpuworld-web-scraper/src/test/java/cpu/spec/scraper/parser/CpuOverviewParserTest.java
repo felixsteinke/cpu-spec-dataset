@@ -1,6 +1,7 @@
 package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CpuOverviewParserTest {
 
+    @Tag("live")
     @Test
     void testExtractSeriesLinks() throws ElementNotFoundException, IOException {
         List<String> actual = CpuOverviewParser.extractNavigationLinks();

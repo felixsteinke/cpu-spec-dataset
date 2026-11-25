@@ -2,6 +2,7 @@ package cpu.spec.scraper.parser;
 
 import cpu.spec.scraper.exception.ElementNotFoundException;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ class CpuProductParserTest {
         assertThrows(ElementNotFoundException.class, () -> CpuProductParser.parseSeriesLinks(Jsoup.parse(withoutSeries)));
     }
 
+    @Tag("live")
     @Test
     void testExtractSeriesLinks() throws ElementNotFoundException, IOException {
         List<String> actual = CpuProductParser.extractSeriesLinks();
