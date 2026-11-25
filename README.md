@@ -124,7 +124,7 @@ Requires __JDK 25__, __Maven__ and __Google Chrome__ (benchmark & cpu-world scra
 automatically by Selenium) and runs on Linux, macOS and Windows (Git Bash):
 
 ```shell
-./scripts/scrape-all.sh                 # all scrapers: amd ampere benchmark intel cpuworld
+./scripts/scrape-all.sh                 # default scrapers: amd ampere benchmark intel
 ./scripts/scrape-all.sh amd benchmark   # selected scrapers
 ```
 
@@ -201,6 +201,10 @@ java -jar ./target/executable.jar
 ```
 
 ### [CPU World Dataset](dataset/cpuworld-cpus.csv)
+
+> __Frozen dataset:__ cpu-world denies automated requests (HTTP 403 for bots, data center IP ranges and the scraping
+> of its content), so the dataset of July 2023 (243 Intel Xeon Platinum & Gold CPUs) is kept as it is. The scraper is
+> excluded from the default runs of `scripts/scrape-all.sh` and the workflows and only runs if it is listed explicitly.
 
 Extracted from [https://www.cpu-world.com/CPUs/CPU.html](https://www.cpu-world.com/CPUs/CPU.html)
 (Intel Xeon Platinum & Gold, waits 3 - 10 s between pages) with the responsible __Web Scraper__ (Chrome).

@@ -13,9 +13,9 @@ on:
   workflow_dispatch:
     inputs:
       scrapers:
-        description: Scrapers to run (space separated)
+        description: Scrapers to run (space separated, cpuworld is frozen and only runs if listed)
         type: string
-        default: amd ampere benchmark intel cpuworld
+        default: amd ampere benchmark intel
       force:
         description: Replace datasets even if a run has much fewer records (scraper.force)
         type: boolean

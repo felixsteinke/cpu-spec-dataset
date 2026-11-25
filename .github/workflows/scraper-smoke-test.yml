@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       scrapers:
-        description: Scrapers to test (space separated)
+        description: Scrapers to test (space separated, cpuworld is frozen and only runs if listed)
         type: string
-        default: amd ampere benchmark intel cpuworld
+        default: amd ampere benchmark intel
 
 jobs:
   smoke-test:

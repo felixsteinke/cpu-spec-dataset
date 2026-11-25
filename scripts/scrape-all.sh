@@ -2,7 +2,8 @@
 # Recreates the datasets: builds the project, runs the web scrapers and validates the datasets for the Dataset API.
 #
 # Usage:   ./scripts/scrape-all.sh [scraper ...]
-#          scrapers: amd ampere benchmark intel cpuworld (default: all, fast ones first)
+#          scrapers: amd ampere benchmark intel (default, fast ones first)
+#                    cpuworld (frozen dataset, only runs if listed, see README)
 # Options: JAVA_OPTS="..." ./scripts/scrape-all.sh
 #          -Dscraper.limit=5     smoke test: only 5 pages per level, output to dataset/*.limited.csv
 #          -Dscraper.delay=500   wait 500 ms between detail page requests (intel)
@@ -17,7 +18,7 @@ cd "$(dirname "$0")/.."
 
 SCRAPERS=("$@")
 if [ ${#SCRAPERS[@]} -eq 0 ]; then
-  SCRAPERS=(amd ampere benchmark intel cpuworld)
+  SCRAPERS=(amd ampere benchmark intel)
 fi
 for scraper in "${SCRAPERS[@]}"; do
   if [ ! -f "$scraper-web-scraper/pom.xml" ]; then
